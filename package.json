@@ -1,0 +1,19 @@
+{
+  "name": "find-lost-pets",
+  "version": "1.0.0",
+  "repository": "git@github.com:dylanpilsner/find-lost-pets.git",
+  "author": "<dylan.pilsner@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev:be": "nodemon ./be-src/index.ts",
+    "dev:fe": "parcel serve ./fe-src/index.html  --dist-dir fe-dist",
+    "build:be": "tsc",
+    "build:fe": "parcel build ./fe-src/index.html --dist-dir fe-dist"
+  },
+  "dependencies": {
+    "@types/node": "^18.11.9",
+    "@vaadin/router": "^1.7.4",
+    "express": "^4.18.2",
+    "parcel": "^2.8.0"
+  }
+}

@@ -1,0 +1,12 @@
+*{
+box-sizing: border-box;
+}
+
+body{
+  margin:0;
+  background-image: url('./assets/pet-background.jpg');
+}
+
+.root{
+  font-family:Poppins;
+}
