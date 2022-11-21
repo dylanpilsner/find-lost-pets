@@ -16,14 +16,13 @@ class Button extends HTMLElement {
       `
         .button{
           height:70px;
-          width:100px;
           background-color:#D1C1AD;
           border:1px solid grey;
           box-shadow:1px 2px 7px 0px rgba(0,0,0,0.75);
           font-family:Poppins;
           font-size:16px;
           font-weight:700;
-          text-align;center;
+          text-align:center;
           border-radius:10px;
           width:335px;
           cursor:pointer;
