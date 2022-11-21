@@ -24,7 +24,8 @@ class Button extends HTMLElement {
           font-weight:700;
           text-align:center;
           border-radius:10px;
-          width:335px;
+          // width:335px;
+          width:100%;
           cursor:pointer;
         }
         

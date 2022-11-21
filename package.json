@@ -8,12 +8,17 @@
     "dev:be": "nodemon ./be-src/index.ts",
     "dev:fe": "parcel serve ./fe-src/index.html  --dist-dir fe-dist",
     "build:be": "tsc",
-    "build:fe": "parcel build ./fe-src/index.html --dist-dir fe-dist"
+    "build:fe": "parcel build ./fe-src/index.html --dist-dir fe-dist",
+    "sync": "ts-node ./be-src/sync.ts"
   },
   "dependencies": {
     "@types/node": "^18.11.9",
     "@vaadin/router": "^1.7.4",
     "express": "^4.18.2",
-    "parcel": "^2.8.0"
+    "jsonwebtoken": "^8.5.1",
+    "parcel": "^2.8.0",
+    "pg": "^8.8.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.25.7"
   }
 }

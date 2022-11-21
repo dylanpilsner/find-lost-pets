@@ -1,3 +1,5 @@
+import { Router } from "../router";
+
 const logo = require("../assets/logo.png");
 const closeImg = require("../assets/close.png");
 const user = require("../assets/user.png");
@@ -8,7 +10,12 @@ class Header extends HTMLElement {
     this.render();
   }
 
-  addListeners() {}
+  addListeners(container: HTMLElement) {
+    const myData = container.querySelector(".my-data");
+    myData.addEventListener("click", (e) => {
+      Router.go("/auth-page");
+    });
+  }
 
   render() {
     const shadow = this.attachShadow({ mode: "open" });
@@ -66,13 +73,15 @@ class Header extends HTMLElement {
         }
         
         .nav-menu {
+
           display:none;
-          position:absolute;
+          position:fixed;
           height:100%;
           width:100%;
-          background-color:#D1ADCF;
           top:0;
           left:0;
+          bottom:0;
+          background-color:#D1ADCF;
           flex-direction: column;
           align-items: center;
           justify-content:center;
@@ -128,7 +137,7 @@ class Header extends HTMLElement {
      </div>
      <nav class=nav-menu>
      <img class="close-nav-menu" src=${closeImg}/>
-     <nav class="nav-item">Mis datos</nav>
+     <nav class="nav-item my-data">Mis datos</nav>
      <nav class="nav-item">Mis mascotas reportadas</nav>
      <nav class="nav-item">Reportar mascota</nav>
      <div class="account-container">
@@ -151,10 +160,11 @@ class Header extends HTMLElement {
     const closeNavMenu = header.querySelector(".close-nav-menu");
 
     closeNavMenu.addEventListener("click", (e) => {
-      console.log("hola");
       const navMenu = header.querySelector(".nav-menu");
       navMenu.classList.toggle("open");
     });
+
+    this.addListeners(header);
   }
 }
 
