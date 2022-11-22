@@ -83,7 +83,8 @@ class Home extends HTMLElement {
     }
 
     .button{
-      width:100%
+      width:100%;
+      max-width:600px;
     }
 
     .lost-pet-cards-container {
@@ -160,6 +161,7 @@ class Home extends HTMLElement {
     .report-information-modal-card {
       position:relative;
       width:90%;
+      max-width:600px;
       background-color:white;
       margin-top:-301.5px;
       top:50%;
@@ -321,7 +323,7 @@ class Home extends HTMLElement {
               </label>
 
               <label class="form-label">
-                <div class="field-label">TU TELÉFONO</div>
+                <div class="field-label">DÓNDE LO VISTE?</div>
                 <textarea class="form-textarea"></textarea>
               </label>
             </form>
