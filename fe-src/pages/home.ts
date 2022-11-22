@@ -151,11 +151,24 @@ class Home extends HTMLElement {
       left:0;
       right:0;
       justify-content:center;
+      opacity:0%;
       display:none;
+
     }
 
     .report-information.active{
       display:flex;
+      animation-duration: 0.5s;
+      animation-name: showsup;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-in-out;
+    }
+
+    @keyframes showsup{
+      50%,
+      100% {
+        opacity: 100%;
+      }
     }
 
     .report-information-modal-card {
