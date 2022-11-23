@@ -6,8 +6,7 @@ export class User extends Model {}
 User.init(
   {
     email: DataTypes.STRING,
-    name: DataTypes.STRING,
-    birthdate: DataTypes.DATE,
+    first_name: DataTypes.STRING,
   },
-  { sequelize, modelName: "User" }
+  { sequelize, modelName: "user" }
 );
