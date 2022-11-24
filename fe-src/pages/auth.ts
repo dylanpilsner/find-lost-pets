@@ -6,15 +6,57 @@ class Auth extends HTMLElement {
     this.render();
   }
 
-  addListeners() {
-    const form = this.querySelector(".form");
-    form.addEventListener("submit", (e) => {
+  signIn(email: string) {
+    const signInForm = this.querySelector(".sign-in.form");
+    signInForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+      const target = e.target as any;
+      const passwordValue = target.password.value;
+      const authentication = await state.authenticate(email, passwordValue);
+      if (authentication.token.authenticationCompleted) {
+        state.setAccountInformation(email, authentication.token);
+        Router.go("/home");
+      } else {
+        window.alert("contraseña incorrecta");
+      }
+    });
+  }
+
+  signUp(param) {
+    const registerForm = this.querySelector(".register.form");
+    registerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      console.log(param);
+    });
+  }
+
+  addListeners(param: { verifyEmail; register; signIn }) {
+    const form = this.querySelector(".form");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const target = e.target as any;
+      const emailValue = target.email.value;
+      const verifyEmail = await state.verifyEmail(emailValue);
+      if (emailValue == "") {
+        window.alert("Por favor, complete todos los campos");
+      } else if (verifyEmail) {
+        this.removeChild(param.verifyEmail);
+        this.appendChild(param.signIn);
+        this.signIn(emailValue);
+      } else {
+        this.removeChild(param.verifyEmail);
+        this.appendChild(param.register);
+        this.signUp(emailValue);
+      }
     });
   }
 
   render() {
     const style = document.createElement("style");
+    const registerSection = document.createElement("section");
+    const signInSection = document.createElement("section");
+    registerSection.classList.add("register-container");
+    signInSection.classList.add("signIn-container");
 
     style.innerHTML =
       /*css*/
@@ -36,6 +78,7 @@ class Auth extends HTMLElement {
         max-width:500px;
         flex-direction:column;
         align-items:center;
+        gap:30px;
       }
       .label-form {
         font-size:16px;
@@ -53,13 +96,18 @@ class Auth extends HTMLElement {
         border-radius: 10px;
         font-size:20px;
         text-align:center;
+        outline:none;
+      }
+
+      .sign-input.name{
+        margin-bottom:30px;
       }
 
       .invisible-button{
-        margin-top:30px;
         width:100%;
         border:none;
         background-color:transparent;
+        margin-bottom:20px;
       }
 
       .button{
@@ -69,12 +117,29 @@ class Auth extends HTMLElement {
 
     this.innerHTML = /*html*/ `
     <custom-header></custom-header>
+    <section class="verify-email-container">
     <div class="auth-page-container">
      <h1 class="title">Ingresar</h1>
      <form class="form">
      <label class="label-form">
      <div class="email">EMAIL</div>
-     <input type="email" class="sign-input" name="email" />
+     <input placeholder="Ingrese su email" type="email" class="sign-input" name="email"/>
+     </label>
+     <button class="invisible-button">
+     <custom-button class="button">Siguiente</custom-button>
+     </button>
+     </form>
+    </div>
+    </section>
+    `;
+
+    signInSection.innerHTML = /*html*/ `
+    <div class="auth-page-container">
+     <h1 class="title">Ingresar</h1>
+     <form class="form sign-in">
+     <label class="label-form">
+     <div class="password">CONTRASEÑA</div>
+     <input type="password" class="sign-input" name="password"/>
      </label>
      <button class="invisible-button">
      <custom-button class="button">Siguiente</custom-button>
@@ -83,9 +148,38 @@ class Auth extends HTMLElement {
     </div>
     `;
 
-    this.appendChild(style);
+    registerSection.innerHTML = /*html*/ `
+    <div class="auth-page-container">
+     <h1 class="title">Ingresar</h1>
+     <form class="form register">
+     <label class="label-form">
+     <div class="nombre">NOMBRE</div>
+     <input placeholder="Ingresa tu nombre" type="text" class="sign-input name" name="nombre"/>
+     </label>
+     <label class="label-form">
+     <div class="email">CONTRASEÑA</div>
+     <input type="password" class="sign-input" name="password"/>
+     </label>
+     <label class="label-form">
+     <div class="email">REPETIR CONTRASEÑA</div>
+     <input type="password" class="sign-input" name="repeat-password"/>
+     </label>
+     <button class="invisible-button">
+     <custom-button class="button">Guardar</custom-button>
+     </button>
+     </form>
+    </div>
+    `;
 
-    this.addListeners();
+    // this.appendChild(registerDiv);
+    this.appendChild(style);
+    const verifyEmailContainer = this.querySelector(".verify-email-container")!;
+
+    this.addListeners({
+      verifyEmail: verifyEmailContainer,
+      register: registerSection,
+      signIn: signInSection,
+    });
   }
 }
 

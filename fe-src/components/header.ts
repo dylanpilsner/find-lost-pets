@@ -1,4 +1,5 @@
 import { Router } from "../router";
+import { state } from "../state";
 
 const logo = require("../assets/logo.png");
 const closeImg = require("../assets/close.png");
@@ -15,12 +16,29 @@ class Header extends HTMLElement {
     myData.addEventListener("click", (e) => {
       Router.go("/auth-page");
     });
+
+    const sign = container.querySelector(".sign");
+    sign.addEventListener("click", (e) => {
+      const target = e.target as any;
+      if (target.textContent == "INICIAR SESIÓN") {
+        Router.go("/auth-page");
+      } else {
+        state.signOut();
+        location.reload();
+      }
+    });
+
+    const logo = container.querySelector(".logo");
+    logo.addEventListener("click", (e) => {
+      Router.go("/home");
+    });
   }
 
   render() {
     const shadow = this.attachShadow({ mode: "open" });
     const header = document.createElement("header");
     const style = document.createElement("style");
+    const cs = state.getState();
     header.classList.add("header");
     style.innerHTML =
       /*css*/
@@ -33,10 +51,6 @@ class Header extends HTMLElement {
           align-items: center;
           padding:0 10%;
           justify-content: space-between;
-        }
-
-        .logo-container{
-          height:100%;
         }
         
         .logo{
@@ -73,19 +87,45 @@ class Header extends HTMLElement {
         }
         
         .nav-menu {
-
-          display:none;
+          display:flex;
           position:fixed;
           height:100%;
           width:100%;
-          top:0;
+          top:-2160px;
           left:0;
           bottom:0;
-          background-color:#D1ADCF;
+          background-color:#ADBDD1;
           flex-direction: column;
           align-items: center;
           justify-content:center;
           gap:20px;
+        }
+
+        .nav-menu.opened{
+          animation-duration: 0.3s;
+          animation-name: navgetsdown;
+          animation-fill-mode: forwards;
+          animation-timing-function: ease-in-out;
+        }
+
+        .nav-menu.closed{
+          animation-duration: 0.3s;
+          animation-name: navgetsup;
+          animation-fill-mode: forwards;
+          animation-timing-function: ease-in-out;
+          top:0px;
+        }
+        
+        @keyframes navgetsup{
+          100%{
+            top:-2160px;
+          }
+        }
+
+        @keyframes navgetsdown{
+          100%{
+            top:0;
+          }
         }
 
         .close-nav-menu{
@@ -114,15 +154,17 @@ class Header extends HTMLElement {
         .user {
           font-size:24px;
           font-weight:400;
+          text-align:center;
         }
         .sign {
           font-size:16px;
           font-weight:500;
+          color: #C6558B;
+          cursor: pointer;
+          text-decoration: underline;
         }
 
-        .nav-menu.open{
-          display:flex;
-        }
+    
         
       `;
 
@@ -142,9 +184,11 @@ class Header extends HTMLElement {
      <nav class="nav-item">Reportar mascota</nav>
      <div class="account-container">
      <img class="user-img" src=${user} />
-     <span class="user">Invitadx</span>
+     <span class="user">${cs.email == "" ? "Invitadx" : cs.email}</span>
      </div>
-     <a class="sign" href="">INICIAR SESIÓN</a>
+     <div class="sign">${
+       cs.email == "" ? "INICIAR SESIÓN" : "CERRAR SESIÓN"
+     }</div>
      </nav>
     `;
 
@@ -154,14 +198,16 @@ class Header extends HTMLElement {
     const openNavMenu = header.querySelector(".open-nav-menu");
     openNavMenu.addEventListener("click", (e) => {
       const navMenu = header.querySelector(".nav-menu");
-      navMenu.classList.toggle("open");
+      navMenu.classList.toggle("opened");
+      navMenu.classList.remove("closed");
     });
 
     const closeNavMenu = header.querySelector(".close-nav-menu");
 
     closeNavMenu.addEventListener("click", (e) => {
       const navMenu = header.querySelector(".nav-menu");
-      navMenu.classList.toggle("open");
+      navMenu.classList.toggle("opened");
+      navMenu.classList.toggle("closed");
     });
 
     this.addListeners(header);

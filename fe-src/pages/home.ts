@@ -96,8 +96,21 @@ class Home extends HTMLElement {
 
     .lost-pet-cards-container:last-child {
       margin-bottom:20px;
-
     }
+
+    @media (min-width:769px){
+      .lost-pet-cards-container{
+        display:grid;
+        gap:50px;
+        grid-template-columns:1fr 1fr ;
+      }
+    }
+    @media (min-width:1366px){
+      .lost-pet-cards-container{
+        grid-template-columns:1fr 1fr 1fr;
+      }
+    }
+    
 
     .card {
       height:234px;
@@ -224,7 +237,6 @@ class Home extends HTMLElement {
     }
 
     .report-form {
-      // height:100%;
       width:100%;
       display:flex;
       flex-direction:column;
@@ -339,6 +351,7 @@ class Home extends HTMLElement {
                 <div class="field-label">DÓNDE LO VISTE?</div>
                 <textarea class="form-textarea"></textarea>
               </label>
+              <custom-button>Enviar</custom-button>
             </form>
             <div class="modal-foot"></div>
           </div>

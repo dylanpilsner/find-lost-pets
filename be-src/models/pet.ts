@@ -6,8 +6,8 @@ export class Pet extends Model {}
 Pet.init(
   {
     name: DataTypes.STRING,
-    last_location_lat: DataTypes.NUMBER,
-    last_location_lng: DataTypes.NUMBER,
+    last_location_lat: DataTypes.FLOAT,
+    last_location_lng: DataTypes.FLOAT,
     status: DataTypes.STRING,
   },
   { sequelize, modelName: "pet" }

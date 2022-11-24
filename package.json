@@ -5,7 +5,7 @@
   "author": "<dylan.pilsner@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev:be": "nodemon ./be-src/index.ts",
+    "dev:be": "nodemon --watch ./be-src/index.ts --exec ts-node ./be-src/dev.ts",
     "dev:fe": "parcel serve ./fe-src/index.html  --dist-dir fe-dist",
     "build:be": "tsc",
     "build:fe": "parcel build ./fe-src/index.html --dist-dir fe-dist",
@@ -14,6 +14,8 @@
   "dependencies": {
     "@types/node": "^18.11.9",
     "@vaadin/router": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^8.5.1",
     "parcel": "^2.8.0",
