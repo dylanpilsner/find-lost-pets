@@ -7,6 +7,7 @@
   "scripts": {
     "dev:be": "nodemon --watch ./be-src/index.ts --exec ts-node ./be-src/dev.ts",
     "dev:fe": "parcel serve ./fe-src/index.html  --dist-dir fe-dist",
+    "dev": "yarn dev:be && yarn dev:fe",
     "build:be": "tsc",
     "build:fe": "parcel build ./fe-src/index.html --dist-dir fe-dist",
     "sync": "ts-node ./be-src/sync.ts"

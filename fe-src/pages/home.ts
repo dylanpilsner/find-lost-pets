@@ -105,6 +105,7 @@ class Home extends HTMLElement {
         grid-template-columns:1fr 1fr ;
       }
     }
+    
     @media (min-width:1366px){
       .lost-pet-cards-container{
         grid-template-columns:1fr 1fr 1fr;

@@ -26,8 +26,25 @@ class Auth extends HTMLElement {
     const registerForm = this.querySelector(".register.form");
     registerForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      console.log(param);
+      const target = e.target as any;
+      const name = target.name.value;
+      const password = target.password.value;
+      const confirmPassword = target["confirm-password"].value;
+      const passwordAlert = this.querySelector(".password-alert");
+
+      if (password != confirmPassword) {
+        passwordAlert.classList.add("active");
+        passwordAlert.textContent = "Las contraseñas no coinciden";
+      } else {
+        Router.go("/home");
+      }
     });
+    // registerForm.addEventListener("keyup", (e) => {
+    //   e.preventDefault();
+    //   const target = e.target as any;
+    //   const password = target.password.value;
+    //   console.log(password);
+    // });
   }
 
   addListeners(param: { verifyEmail; register; signIn }) {
@@ -110,7 +127,13 @@ class Auth extends HTMLElement {
         margin-bottom:20px;
       }
 
-      .button{
+      .password-alert{
+        color:#eb4034;
+        font-weight:500;
+        display:none;
+      }
+      .password-alert.active{
+        display:initial;
       }
       
       `;
@@ -154,16 +177,17 @@ class Auth extends HTMLElement {
      <form class="form register">
      <label class="label-form">
      <div class="nombre">NOMBRE</div>
-     <input placeholder="Ingresa tu nombre" type="text" class="sign-input name" name="nombre"/>
+     <input placeholder="Ingresa tu nombre" type="text" class="sign-input name" name="name" required/>
      </label>
      <label class="label-form">
      <div class="email">CONTRASEÑA</div>
-     <input type="password" class="sign-input" name="password"/>
+     <input type="password" class="sign-input password" name="password" required/>
      </label>
      <label class="label-form">
      <div class="email">REPETIR CONTRASEÑA</div>
-     <input type="password" class="sign-input" name="repeat-password"/>
+     <input type="password" class="sign-input confirm-password" name="confirm-password" required/>
      </label>
+     <span class="password-alert"></span>
      <button class="invisible-button">
      <custom-button class="button">Guardar</custom-button>
      </button>
@@ -171,7 +195,6 @@ class Auth extends HTMLElement {
     </div>
     `;
 
-    // this.appendChild(registerDiv);
     this.appendChild(style);
     const verifyEmailContainer = this.querySelector(".verify-email-container")!;
 
