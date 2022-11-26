@@ -13,8 +13,32 @@ class Header extends HTMLElement {
 
   addListeners(container: HTMLElement) {
     const myData = container.querySelector(".my-data");
+    const cs = state.getState();
     myData.addEventListener("click", (e) => {
-      Router.go("/auth-page");
+      if (cs.token != "") {
+        Router.go("/profile");
+      } else Router.go("/auth-page");
+    });
+
+    const reportedPets = container.querySelector(".my-reported-pets");
+    reportedPets.addEventListener("click", (e) => {
+      if (cs.token == "") {
+        window.alert(
+          "Para ver sus mascotas reportadas, por favor inicie sesión"
+        );
+        Router.go("/auth-page");
+      } else {
+        Router.go("/my-reported-pets");
+      }
+    });
+    const reportPet = container.querySelector(".report-pet");
+    reportPet.addEventListener("click", (e) => {
+      if (cs.token == "") {
+        window.alert("Para reportar una mascota, por favor inicie sesión");
+        Router.go("/auth-page");
+      } else {
+        Router.go("/report-pet");
+      }
     });
 
     const sign = container.querySelector(".sign");
@@ -24,7 +48,11 @@ class Header extends HTMLElement {
         Router.go("/auth-page");
       } else {
         state.signOut();
-        location.reload();
+        if (location.pathname == "/home") {
+          location.reload();
+        } else {
+          Router.go("/home");
+        }
       }
     });
 
@@ -180,8 +208,8 @@ class Header extends HTMLElement {
      <nav class=nav-menu>
      <img class="close-nav-menu" src=${closeImg}/>
      <nav class="nav-item my-data">Mis datos</nav>
-     <nav class="nav-item">Mis mascotas reportadas</nav>
-     <nav class="nav-item">Reportar mascota</nav>
+     <nav class="nav-item my-reported-pets">Mis mascotas reportadas</nav>
+     <nav class="nav-item report-pet">Reportar mascota</nav>
      <div class="account-container">
      <img class="user-img" src=${user} />
      <span class="user">${cs.email == "" ? "Invitadx" : cs.email}</span>

@@ -23,6 +23,22 @@ const state = {
     return this.data;
   },
 
+  async pullProfile(params) {
+    const cs = this.getState();
+    const res = await fetch(`${API_BASE_URL}/profile`, {
+      headers: {
+        authorization: `bearer ${cs.token}`,
+      },
+    });
+    const data = await res.json();
+
+    params.name.value = data.first_name;
+    params.password.value = data.password.slice(0, 16);
+    params.confirmPassword.value = data.password.slice(0, 16);
+
+    console.log(data);
+  },
+
   setGeolocation(lat: number, lng: number) {
     const cs = this.getState();
     cs.geolocation.latitude = lat;
@@ -31,7 +47,7 @@ const state = {
   },
 
   async verifyEmail(email: string) {
-    const fetching = await fetch(`${API_BASE_URL}/verify-user`, {
+    const res = await fetch(`${API_BASE_URL}/verify-user`, {
       method: "post",
       headers: {
         "content-type": "application/json",
@@ -39,13 +55,25 @@ const state = {
       body: JSON.stringify({ email }),
     });
 
-    const data = await fetching.json();
+    const data = await res.json();
 
     return data.verifiedEmail;
   },
 
+  async signUp(email: string, first_name: string, password: string) {
+    const res = await fetch(`${API_BASE_URL}/user`, {
+      method: "post",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ email, first_name, password }),
+    });
+    const data = await res.json();
+    console.log(data);
+  },
+
   async authenticate(email: string, password: string) {
-    const fetching = await fetch(`${API_BASE_URL}/user/token`, {
+    const res = await fetch(`${API_BASE_URL}/user/token`, {
       method: "post",
       headers: {
         "content-type": "application/json",
@@ -53,21 +81,21 @@ const state = {
       body: JSON.stringify({ email, password }),
     });
 
-    const data = await fetching.json();
+    const data = await res.json();
     return data;
-  },
-
-  setAccountInformation(email: string, token: string) {
-    const cs = state.getState();
-    cs.email = email;
-    cs.token = token;
-    this.setState(cs);
   },
 
   signOut() {
     const cs = this.getState();
     cs.email = "";
     cs.token = "";
+    this.setState(cs);
+  },
+
+  setAccountInformation(email: string, token) {
+    const cs = state.getState();
+    cs.email = email;
+    cs.token = token.token;
     this.setState(cs);
   },
 

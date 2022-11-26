@@ -29,6 +29,7 @@ async function createUser(userInformation: {
     defaults: {
       email,
       password: hashPassword(password),
+      first_name: first_name,
     },
   });
 
@@ -52,4 +53,21 @@ async function verifyEmail(email: string) {
   }
 }
 
-export { createUser, verifyEmail };
+async function getProfile(id) {
+  if (!id) {
+    throw "falta id";
+  }
+  const user = await models.Auth.findOne({
+    where: {
+      id,
+    },
+  });
+  return user;
+}
+async function updateProfile(id) {
+  if (!id) {
+    throw "falta id";
+  }
+}
+
+export { createUser, verifyEmail, getProfile, updateProfile };

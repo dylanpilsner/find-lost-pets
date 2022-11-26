@@ -15,10 +15,20 @@ app.use(
   })
 );
 app.use(cors());
+
+app.get("/test", async (req, res) => {
+  const todos = await User.findAll();
+  res.json(todos);
+});
+
+app.delete("/delete", async (req, res) => {
+  const borrar = await User.destroy({ where: { id: req.body.id } });
+  res.json(borrar);
+});
+
 // sign up/in
 app.post("/user", async (req, res) => {
   const body = req.body;
-  console.log(body);
   try {
     const createUserResponse = await userController.createUser(body);
     res.json({ createUserResponse });
@@ -31,8 +41,6 @@ app.post("/user/token", async (req, res) => {
   const { body } = req;
 
   const token = await authController.assignToken(body);
-  console.log(token);
-
   res.json({ token });
 });
 
@@ -50,6 +58,11 @@ app.post("/verify-user", async (req, res) => {
 app.get("/user", async (req, res) => {
   const todos = await User.findAll();
   res.json({ todos });
+});
+
+app.get("/profile", authMiddleware, async (req, res) => {
+  const user = await userController.getProfile(req._user.id);
+  res.json(user);
 });
 
 app.listen(port, () => {

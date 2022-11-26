@@ -5,6 +5,7 @@ import * as jwt from "jsonwebtoken";
 export async function assignToken(authInformation: {
   email: string;
   password: string;
+  full_name: string;
 }) {
   const { email, password } = authInformation;
 

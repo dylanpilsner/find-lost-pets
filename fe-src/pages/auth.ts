@@ -17,18 +17,21 @@ class Auth extends HTMLElement {
         state.setAccountInformation(email, authentication.token);
         Router.go("/home");
       } else {
-        window.alert("contraseña incorrecta");
+        const passwordAlert = this.querySelector(".password-alert");
+        passwordAlert.classList.add("active");
+        passwordAlert.textContent = "Contraseña incorrecta";
       }
     });
   }
 
-  signUp(param) {
-    const registerForm = this.querySelector(".register.form");
-    registerForm.addEventListener("submit", (e) => {
+  signUp(email) {
+    const registerForm = this.querySelector(".register.form") as any;
+
+    registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const target = e.target as any;
-      const name = target.name.value;
       const password = target.password.value;
+      const name = target.name.value;
       const confirmPassword = target["confirm-password"].value;
       const passwordAlert = this.querySelector(".password-alert");
 
@@ -36,15 +39,12 @@ class Auth extends HTMLElement {
         passwordAlert.classList.add("active");
         passwordAlert.textContent = "Las contraseñas no coinciden";
       } else {
+        await state.signUp(email, name, password);
+        const authentication = await state.authenticate(email, password);
+        state.setAccountInformation(email, authentication.token);
         Router.go("/home");
       }
     });
-    // registerForm.addEventListener("keyup", (e) => {
-    //   e.preventDefault();
-    //   const target = e.target as any;
-    //   const password = target.password.value;
-    //   console.log(password);
-    // });
   }
 
   addListeners(param: { verifyEmail; register; signIn }) {
@@ -54,9 +54,7 @@ class Auth extends HTMLElement {
       const target = e.target as any;
       const emailValue = target.email.value;
       const verifyEmail = await state.verifyEmail(emailValue);
-      if (emailValue == "") {
-        window.alert("Por favor, complete todos los campos");
-      } else if (verifyEmail) {
+      if (verifyEmail) {
         this.removeChild(param.verifyEmail);
         this.appendChild(param.signIn);
         this.signIn(emailValue);
@@ -146,7 +144,7 @@ class Auth extends HTMLElement {
      <form class="form">
      <label class="label-form">
      <div class="email">EMAIL</div>
-     <input placeholder="Ingrese su email" type="email" class="sign-input" name="email"/>
+     <input placeholder="Ingrese su email" type="email" class="sign-input" name="email" required/>
      </label>
      <button class="invisible-button">
      <custom-button class="button">Siguiente</custom-button>
@@ -162,8 +160,9 @@ class Auth extends HTMLElement {
      <form class="form sign-in">
      <label class="label-form">
      <div class="password">CONTRASEÑA</div>
-     <input type="password" class="sign-input" name="password"/>
+     <input type="password" class="sign-input" name="password" required/>
      </label>
+     <span class="password-alert"></span>
      <button class="invisible-button">
      <custom-button class="button">Siguiente</custom-button>
      </button>
@@ -181,7 +180,7 @@ class Auth extends HTMLElement {
      </label>
      <label class="label-form">
      <div class="email">CONTRASEÑA</div>
-     <input type="password" class="sign-input password" name="password" required/>
+     <input type="password" class="sign-input password" name="password"required />
      </label>
      <label class="label-form">
      <div class="email">REPETIR CONTRASEÑA</div>
@@ -189,7 +188,7 @@ class Auth extends HTMLElement {
      </label>
      <span class="password-alert"></span>
      <button class="invisible-button">
-     <custom-button class="button">Guardar</custom-button>
+     <custom-button class="button" id="button">Guardar</custom-button>
      </button>
      </form>
     </div>
