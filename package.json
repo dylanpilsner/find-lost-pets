@@ -1,17 +1,27 @@
 {
   "name": "find-lost-pets",
   "version": "1.0.0",
-  "repository": "git@github.com:dylanpilsner/find-lost-pets.git",
-  "author": "<dylan.pilsner@gmail.com>",
-  "license": "MIT",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "dev:be": "nodemon --watch ./be-src/index.ts --exec ts-node ./be-src/dev.ts",
-    "dev:fe": "parcel serve ./fe-src/index.html  --dist-dir fe-dist",
-    "dev": "yarn dev:be && yarn dev:fe",
+    "dev:be": "nodemon --watch ./be-src/index.ts  --exec ts-node ./be-src/dev.ts",
+    "dev:fe": "parcel serve ./fe-src/index.html --dist-dir fe-dist",
     "build:be": "tsc",
     "build:fe": "parcel build ./fe-src/index.html --dist-dir fe-dist",
+    "build": "npm run build:be && npm run build:fe",
     "sync": "ts-node ./be-src/sync.ts"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dylanpilsner/find-lost-pets.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dylanpilsner/find-lost-pets/issues"
+  },
+  "homepage": "https://github.com/dylanpilsner/find-lost-pets#readme",
   "dependencies": {
     "@types/node": "^18.11.9",
     "@vaadin/router": "^1.7.4",
@@ -22,6 +32,6 @@
     "parcel": "^2.8.0",
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.25.7"
+    "sequelize": "^6.25.8"
   }
 }
