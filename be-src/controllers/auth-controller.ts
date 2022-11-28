@@ -30,3 +30,37 @@ export async function assignToken(authInformation: {
     };
   }
 }
+
+export async function updatePassword(id: number, updatedPassword: string) {
+  if (!id) {
+    throw "falta id";
+  }
+
+  if (!updatedPassword) {
+    throw "falta nueva contraseña";
+  }
+
+  const findedUser = await models.Auth.findOne({
+    where: {
+      id,
+    },
+  });
+
+  const oldPassword = findedUser.get("password");
+
+  const hashedPassword = hashPassword(updatedPassword);
+
+  if (hashedPassword == oldPassword) {
+    return { passwordChanged: false };
+  }
+  const updatedUser = await models.Auth.update(
+    { password: hashedPassword },
+    {
+      where: {
+        id: id,
+      },
+    }
+  );
+
+  return { passwordChanged: true };
+}

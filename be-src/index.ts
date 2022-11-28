@@ -2,8 +2,9 @@ import * as express from "express";
 import * as path from "path";
 import * as userController from "./controllers/user-controller";
 import * as authController from "./controllers/auth-controller";
+import * as petController from "./controllers/pet-controller";
 import { authMiddleware } from "./middleware/methods";
-import { User } from "./models/models";
+import { User, Auth } from "./models/models";
 import * as cors from "cors";
 
 const app = express();
@@ -17,7 +18,7 @@ app.use(
 app.use(cors());
 
 app.get("/test", async (req, res) => {
-  const todos = await User.findAll();
+  const todos = await Auth.findAll();
   res.json(todos);
 });
 
@@ -63,6 +64,49 @@ app.get("/user", async (req, res) => {
 app.get("/profile", authMiddleware, async (req, res) => {
   const user = await userController.getProfile(req._user.id);
   res.json(user);
+});
+
+app.post("/update-name", authMiddleware, async (req, res) => {
+  const { body } = req;
+
+  try {
+    const updatedUser = await userController.updateFirstName(
+      req._user.id,
+      body.first_name
+    );
+    res.json({ updatedUser });
+  } catch (err) {
+    res.json({ err });
+  }
+});
+app.post("/update-password", authMiddleware, async (req, res) => {
+  const { body } = req;
+
+  try {
+    const updatedUser = await authController.updatePassword(
+      req._user.id,
+      body.password
+    );
+    res.json({ changeStatus: updatedUser.passwordChanged });
+  } catch (err) {
+    res.json({ err });
+  }
+});
+
+app.post("/report-lost-pet", authMiddleware, async (req, res) => {
+  const { name, last_location_lat, last_location_lng, pictureURL } = req.body;
+  try {
+    const newReportedPet = await petController.createNewReportedPet({
+      name,
+      last_location_lat,
+      last_location_lng,
+      pictureURL,
+      userId: req._user.id,
+    });
+    res.json(newReportedPet);
+  } catch (err) {
+    res.json({ err });
+  }
 });
 
 app.listen(port, () => {

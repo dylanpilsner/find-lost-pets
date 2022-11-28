@@ -15,12 +15,12 @@ router.setRoutes([
     component: "profile-page",
   },
   {
-    path: "/report-pet",
-    component: "profile-page",
+    path: "/my-reported-pets",
+    component: "reported-pets-page",
   },
   {
-    path: "/my-reported-pets",
-    component: "profile-page",
+    path: "/report-pet",
+    component: "report-pet-page",
   },
 ]);
 if (location.pathname == "/") {

@@ -31,12 +31,12 @@ const state = {
       },
     });
     const data = await res.json();
+    return data;
+    // params.name.value = data.first_name;
+    // params.password.value = data.password.slice(0, 16);
+    // params.confirmPassword.value = data.password.slice(0, 16);
 
-    params.name.value = data.first_name;
-    params.password.value = data.password.slice(0, 16);
-    params.confirmPassword.value = data.password.slice(0, 16);
-
-    console.log(data);
+    // console.log(data);
   },
 
   setGeolocation(lat: number, lng: number) {
@@ -58,6 +58,31 @@ const state = {
     const data = await res.json();
 
     return data.verifiedEmail;
+  },
+
+  async updateName(first_name: string) {
+    const cs = this.getState();
+    const res = await fetch(`${API_BASE_URL}/update-name`, {
+      method: "post",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `bearer ${cs.token}`,
+      },
+      body: JSON.stringify({ first_name }),
+    });
+  },
+  async updatePassword(password: string) {
+    const cs = this.getState();
+    const res = await fetch(`${API_BASE_URL}/update-password`, {
+      method: "post",
+      headers: {
+        "content-type": "application/json",
+        Authorization: `bearer ${cs.token}`,
+      },
+      body: JSON.stringify({ password }),
+    });
+    const data = await res.json();
+    return data;
   },
 
   async signUp(email: string, first_name: string, password: string) {

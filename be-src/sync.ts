@@ -4,7 +4,7 @@ import "./models/models";
 
 (async function () {
   try {
-    const sync = await sequelize.sync({ alter: true });
+    const sync = await sequelize.sync({ force: true });
     console.log(sync);
   } catch (err) {
     console.log({ err });

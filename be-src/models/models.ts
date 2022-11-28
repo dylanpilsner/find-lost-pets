@@ -11,10 +11,6 @@ Auth.belongsTo(User);
 User.hasMany(Pet);
 Pet.belongsTo(User);
 
-// Un usuario puede tener muchos reports
-User.hasMany(Report);
-Report.belongsTo(User);
-
 // Una mascota puede tener muchos reports
 Pet.hasMany(Report);
 Report.belongsTo(Pet);

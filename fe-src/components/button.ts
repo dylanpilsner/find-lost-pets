@@ -7,16 +7,19 @@ class Button extends HTMLElement {
   addListeners() {}
 
   render() {
+    const test = "black";
     const shadow = this.attachShadow({ mode: "open" });
     const button = document.createElement("button");
     const style = document.createElement("style");
+    const attribute = this.hasAttribute("color");
+    const color = this.getAttribute("color");
     button.classList.add("button");
     style.innerHTML =
       /*css*/
       `
         .button{
           height:70px;
-          background-color:#D1C1AD;
+          background-color:${!attribute ? "#D1C1AD" : color};
           border:1px solid grey;
           box-shadow:1px 2px 7px 0px rgba(0,0,0,0.75);
           font-family:Poppins;
@@ -24,7 +27,6 @@ class Button extends HTMLElement {
           font-weight:700;
           text-align:center;
           border-radius:10px;
-          // width:335px;
           width:100%;
           cursor:pointer;
         }

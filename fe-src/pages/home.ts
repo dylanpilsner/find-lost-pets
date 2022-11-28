@@ -29,6 +29,7 @@ class Home extends HTMLElement {
     const reportInformation = this.querySelectorAll(".report-information-link");
     reportInformation.forEach((i) => {
       i.addEventListener("click", (e) => {
+        const cs = state.getState();
         const reportModel = this.querySelector(".report-information");
         reportModel.classList.toggle("active");
       });
@@ -62,6 +63,12 @@ class Home extends HTMLElement {
       font-weight:700;
       align-self:center;
       margin:20px 0;
+    }
+
+    @media (min-width:769px){
+      .title{
+        text-align:center;
+      }
     }
 
     .get-location-information{

@@ -64,10 +64,26 @@ async function getProfile(id) {
   });
   return user;
 }
-async function updateProfile(id) {
-  if (!id) {
-    throw "falta id";
+async function updateFirstName(id, updatedName: string) {
+  if (!updatedName) {
+    throw "falta first_name";
   }
+
+  const updatedFirstname = {
+    first_name: updatedName,
+  };
+
+  const updatedUser = await models.User.update(updatedFirstname, {
+    where: {
+      id,
+    },
+  });
+  const updatedAuth = await models.Auth.update(updatedFirstname, {
+    where: {
+      id,
+    },
+  });
+  return updatedUser;
 }
 
-export { createUser, verifyEmail, getProfile, updateProfile };
+export { createUser, verifyEmail, getProfile, updateFirstName };

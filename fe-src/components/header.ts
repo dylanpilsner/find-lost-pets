@@ -167,6 +167,7 @@ class Header extends HTMLElement {
         .nav-item {
           font-size:24px;
           font-weight:700;
+          cursor:pointer;
         }
         .account-container {
           margin-top:100px;
