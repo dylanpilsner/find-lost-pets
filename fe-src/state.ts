@@ -1,5 +1,5 @@
 const API_BASE_URL = process.env.API_BASE_URL;
-
+const test = process.env.TEST;
 const state = {
   data: {
     geolocation: {
@@ -13,6 +13,7 @@ const state = {
 
   init() {
     const state = JSON.parse(localStorage.getItem("saved-state"));
+    console.log(test);
 
     if (state) {
       this.setState(state);

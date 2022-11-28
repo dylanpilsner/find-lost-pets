@@ -1,5 +1,6 @@
 import { Router } from "@vaadin/router";
 import { state } from "../state";
+
 const defaultImage = require("../assets/default-image.png");
 const husky = require("../assets/husky.jpg");
 class ReportPet extends HTMLElement {
@@ -7,7 +8,55 @@ class ReportPet extends HTMLElement {
     this.render();
   }
 
-  addListeners() {}
+  addListeners() {
+    let locationCoordinates;
+    const MAPBOX_TOKEN =
+      "pk.eyJ1IjoiZHlsYW5kZXYiLCJhIjoiY2xiMDNtbHBnMWZxazN2bnBvczJ5MnU0MyJ9.amcslgDMLVFcS3PrmpPSMA";
+    const mapboxClient = new MapboxClient(MAPBOX_TOKEN);
+
+    function initMap() {
+      mapboxgl.accessToken = MAPBOX_TOKEN;
+      return new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/mapbox/streets-v11",
+      });
+    }
+
+    function initSearchForm(callback) {
+      const searchInput = document.querySelector(".search-location");
+      searchInput.addEventListener("keyup", (e) => {
+        e.preventDefault();
+        const target = e.target as any;
+        const event = e as any;
+        if (event.keyCode === 13) {
+          mapboxClient.geocodeForward(
+            target.value,
+            {
+              country: "ar",
+              autocomplete: true,
+              language: "es",
+            },
+            function (err, data, res) {
+              if (!err) callback(data.features);
+            }
+          );
+        }
+      });
+    }
+
+    window.map = initMap();
+    initSearchForm(function (results) {
+      const firstResult = results[0];
+      const [lng, lat] = firstResult.geometry.coordinates;
+      locationCoordinates = { lng, lat };
+      const marker = new mapboxgl.Marker()
+        .setLngLat(firstResult.geometry.coordinates)
+        .addTo(map);
+      map.setCenter(firstResult.geometry.coordinates);
+      map.setZoom(17);
+      console.log("hola ", locationCoordinates);
+    });
+  }
 
   render() {
     const style = document.createElement("style");
@@ -50,13 +99,7 @@ class ReportPet extends HTMLElement {
         text-align:center;
         outline:none;
       }
-      .data-input:read-only {
-        background-color:#d6d5da;
-      }
 
-      .data-input.name{
-        margin-bottom:30px;
-      }
 
       .invisible-button{
         width:100%;
@@ -87,6 +130,25 @@ class ReportPet extends HTMLElement {
       .button{
         width:100%;
       }
+
+      .
+      
+      .map{
+        height:150px;
+        width:100%;
+      }
+
+      @media (min-width:769px){
+        .map{
+          height:250px;
+        }
+      }
+      
+      .instructions{
+        margin:0;
+        font-weight:500;
+        font-size:16px;
+      }
       
       `;
 
@@ -103,7 +165,15 @@ class ReportPet extends HTMLElement {
       <img class="pet-img" src=${defaultImage}>
       </div>
       <custom-button color="#D1ADCF" class="button">Agregar/modificar foto</custom-button>
-     </form>
+     <div id="map" class="map" style="width: 100%; height: 250px"></div>
+     <label class="label-form">
+     <div class="nombre">UBICACIÓN</div>
+     <input type="text" class="data-input search-location" name="search-location" required/>
+     </label>
+     <p class="instructions">Buscá un punto de referencia para reportar a tu mascota. Puede ser una dirección, un barrio o una ciudad.</p>
+     <custom-button class="button" color="#D1ADCF">Guardar</custom-button>
+     <custom-button class="button" color="#CDCDCD">Cancelar</custom-button>
+    </form>
      </div>
     `;
 

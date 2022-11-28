@@ -28,7 +28,6 @@ class Profile extends HTMLElement {
       if (password.hasAttribute("readonly")) {
         const name = this.querySelector(".name.data-input") as any;
         name.toggleAttribute("readonly");
-        await state.updateName(name.value);
       }
     });
 

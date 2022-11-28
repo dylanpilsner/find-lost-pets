@@ -10,6 +10,7 @@ import * as cors from "cors";
 const app = express();
 const port = process.env.PORT || 3000;
 const staticDirPath = path.resolve(__dirname, "../fe-dist");
+
 app.use(
   express.json({
     limit: "50mb",
