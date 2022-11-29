@@ -6,6 +6,7 @@ import "./pages/reported-pets";
 import "./pages/report-pet";
 import "./components/header";
 import "./components/button";
+import "./components/loader";
 import { state } from "./state";
 
 (function () {
