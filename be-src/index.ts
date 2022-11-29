@@ -4,9 +4,8 @@ import * as userController from "./controllers/user-controller";
 import * as authController from "./controllers/auth-controller";
 import * as petController from "./controllers/pet-controller";
 import { authMiddleware } from "./middleware/methods";
-import { User, Auth } from "./models/models";
+import { User, Auth, Pet } from "./models/models";
 import * as cors from "cors";
-
 const app = express();
 const port = process.env.PORT || 3000;
 const staticDirPath = path.resolve(__dirname, "../fe-dist");
@@ -19,8 +18,8 @@ app.use(
 app.use(cors());
 
 app.get("/test", async (req, res) => {
-  const todos = await Auth.findAll();
-  res.json(todos);
+  const todos = await Pet.findAll();
+  res.json({ todos });
 });
 
 app.delete("/delete", async (req, res) => {
@@ -95,16 +94,32 @@ app.post("/update-password", authMiddleware, async (req, res) => {
 });
 
 app.post("/report-lost-pet", authMiddleware, async (req, res) => {
-  const { name, last_location_lat, last_location_lng, pictureURL } = req.body;
+  const {
+    name,
+    last_location_lat,
+    last_location_lng,
+    pictureURL,
+    point_of_reference,
+  } = req.body;
   try {
     const newReportedPet = await petController.createNewReportedPet({
       name,
       last_location_lat,
       last_location_lng,
       pictureURL,
+      point_of_reference,
       userId: req._user.id,
     });
     res.json(newReportedPet);
+  } catch (err) {
+    res.json({ err });
+  }
+});
+
+app.get("/get-my-pets", authMiddleware, async (req, res) => {
+  try {
+    const myReportedPets = await userController.getMyReportedPets(req._user.id);
+    res.json(myReportedPets);
   } catch (err) {
     res.json({ err });
   }

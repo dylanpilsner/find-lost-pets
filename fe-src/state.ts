@@ -1,5 +1,4 @@
-const API_BASE_URL = process.env.API_BASE_URL;
-const test = process.env.TEST;
+const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:3000";
 const state = {
   data: {
     geolocation: {
@@ -12,8 +11,7 @@ const state = {
   listeners: [],
 
   init() {
-    const state = JSON.parse(localStorage.getItem("saved-state"));
-    console.log(test);
+    const state = JSON.parse(localStorage.getItem("saved-state")!);
 
     if (state) {
       this.setState(state);
@@ -107,6 +105,32 @@ const state = {
       body: JSON.stringify({ email, password }),
     });
 
+    const data = await res.json();
+    return data;
+  },
+
+  async reportLostPet(params: {
+    name: string;
+    last_location_lat: number;
+    last_location_lng: number;
+    point_of_reference: string;
+    pictureURL: string;
+  }) {
+    const cs = this.getState();
+    const res = await fetch(`${API_BASE_URL}/report-lost-pet`, {
+      method: "post",
+      headers: {
+        "content-type": "application/json",
+        authorization: `bearer ${cs.token}`,
+      },
+      body: JSON.stringify({
+        name: params.name,
+        point_of_reference: params.point_of_reference,
+        last_location_lat: params.last_location_lat,
+        last_location_lng: params.last_location_lng,
+        pictureURL: params.pictureURL,
+      }),
+    });
     const data = await res.json();
     return data;
   },

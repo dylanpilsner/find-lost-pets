@@ -1,6 +1,8 @@
 import { Router } from "@vaadin/router";
 import { state } from "../state";
-
+import * as mapboxgl from "mapbox-gl";
+import { MAPBOX_TOKEN, mapboxClient } from "../lib/mapbox";
+import Dropzone from "dropzone";
 const defaultImage = require("../assets/default-image.png");
 const husky = require("../assets/husky.jpg");
 class ReportPet extends HTMLElement {
@@ -10,10 +12,7 @@ class ReportPet extends HTMLElement {
 
   addListeners() {
     let locationCoordinates;
-    const MAPBOX_TOKEN =
-      "pk.eyJ1IjoiZHlsYW5kZXYiLCJhIjoiY2xiMDNtbHBnMWZxazN2bnBvczJ5MnU0MyJ9.amcslgDMLVFcS3PrmpPSMA";
-    const mapboxClient = new MapboxClient(MAPBOX_TOKEN);
-
+    let picURL;
     function initMap() {
       mapboxgl.accessToken = MAPBOX_TOKEN;
       return new mapboxgl.Map({
@@ -23,7 +22,10 @@ class ReportPet extends HTMLElement {
     }
 
     function initSearchForm(callback) {
-      const searchInput = document.querySelector(".search-location");
+      const form = document.querySelector(".form") as any;
+
+      const searchInput = document.querySelector(".search-location") as any;
+      const saveButton = document.querySelector(".button.save");
       searchInput.addEventListener("keyup", (e) => {
         e.preventDefault();
         const target = e.target as any;
@@ -42,19 +44,92 @@ class ReportPet extends HTMLElement {
           );
         }
       });
+      saveButton.addEventListener("click", (e) => {
+        const target = e.target as any;
+        if (!locationCoordinates && form["search-location"].value != "") {
+          mapboxClient.geocodeForward(
+            searchInput.value,
+            {
+              country: "ar",
+              autocomplete: true,
+              language: "es",
+            },
+            function (err, data, res) {
+              if (!err) callback(data.features);
+            }
+          );
+        }
+      });
     }
-
-    window.map = initMap();
+    const map = initMap();
     initSearchForm(function (results) {
       const firstResult = results[0];
       const [lng, lat] = firstResult.geometry.coordinates;
       locationCoordinates = { lng, lat };
       const marker = new mapboxgl.Marker()
         .setLngLat(firstResult.geometry.coordinates)
-        .addTo(map);
+        .addTo();
       map.setCenter(firstResult.geometry.coordinates);
       map.setZoom(17);
-      console.log("hola ", locationCoordinates);
+    });
+    const dropzone = document.querySelector(".img-container");
+    const picButton = document.querySelector(".button.pic");
+
+    const myDropzone = new Dropzone(picButton, {
+      url: "/falsa",
+      autoProcessQueue: false,
+      thumbnailWidth: 350,
+      thumbnailHeight: 145,
+      previewsContainer: dropzone,
+    });
+    myDropzone.on("thumbnail", (file) => {
+      picURL = file.dataURL;
+      const details = document.querySelector(".dz-details");
+      const successMark = document.querySelector(".dz-success-mark");
+      const errorMark = document.querySelector(".dz-error-mark");
+      details.remove();
+      successMark.remove();
+      errorMark.remove();
+    });
+
+    const saveButton = document.querySelector(".button.save");
+    const cancelButton = document.querySelector(".button.cancel");
+    saveButton.addEventListener("click", async (e) => {
+      const form = document.querySelector(".form") as any;
+      const statusMessage = document.querySelector(".status-message");
+      if (form.name.value == "") {
+        statusMessage.textContent =
+          "Por favor, ingrese el nombre de su mascota";
+        statusMessage.classList.add("error");
+        return false;
+      }
+      if (form["search-location"].value == "") {
+        statusMessage.textContent =
+          "Por favor, ingrese la última ubicación donde viste a tu mascota";
+        statusMessage.classList.add("error");
+        return false;
+      }
+      if (!picURL) {
+        statusMessage.textContent = "Por favor, ingrese una foto de su mascota";
+        statusMessage.classList.add("error");
+        return false;
+      }
+
+      setTimeout(async () => {
+        const newPetData = await state.reportLostPet({
+          name: form.name.value,
+          last_location_lat: locationCoordinates.lat,
+          last_location_lng: locationCoordinates.lng,
+          pictureURL: picURL,
+          point_of_reference: form["search-location"].value.toUpperCase(),
+        });
+        statusMessage.classList.add("success");
+        statusMessage.textContent = "Mascota reportada con éxito!";
+      }, 500);
+    });
+
+    cancelButton.addEventListener("click", (e) => {
+      Router.go("/home");
     });
   }
 
@@ -100,6 +175,13 @@ class ReportPet extends HTMLElement {
         outline:none;
       }
 
+      .dz-hidden-input{
+        height:100%;
+        width:100%;
+        position:initial;
+        visibility:initial;
+      }
+      
 
       .invisible-button{
         width:100%;
@@ -127,6 +209,23 @@ class ReportPet extends HTMLElement {
         object-fit:cover;
       }
       
+      .dz-preview.dz-image-preview {
+        width:100%;
+        height:100%;
+      }
+
+      .dz-image{
+        width:100%;
+        height:100%;
+      }
+
+      img[data-dz-thumbnail]{
+        width:100%;
+        height:100%;
+        object-fit:cover;
+      }
+      
+      
       .button{
         width:100%;
       }
@@ -149,6 +248,19 @@ class ReportPet extends HTMLElement {
         font-weight:500;
         font-size:16px;
       }
+
+      .status-message{
+        font-weight:600;
+        text-align:center;
+      }
+
+      .status-message.error{
+        color:red;
+      }
+
+      .status-message.success{
+        color:blue;
+      }
       
       `;
 
@@ -159,20 +271,20 @@ class ReportPet extends HTMLElement {
      <form class="form">
      <label class="label-form">
      <div class="nombre">NOMBRE</div>
-     <input placeholder="Ingresa tu nombre" type="text" class="data-input name" name="name" required/>
+     <input placeholder="Ingresa el nombre de tu mascota" type="text" class="data-input name" name="name" required/>
      </label>
       <div class="img-container">
-      <img class="pet-img" src=${defaultImage}>
       </div>
-      <custom-button color="#D1ADCF" class="button">Agregar/modificar foto</custom-button>
+      <custom-button color="#D1ADCF" class="button pic">Agregar/modificar foto</custom-button>
      <div id="map" class="map" style="width: 100%; height: 250px"></div>
      <label class="label-form">
      <div class="nombre">UBICACIÓN</div>
      <input type="text" class="data-input search-location" name="search-location" required/>
      </label>
      <p class="instructions">Buscá un punto de referencia para reportar a tu mascota. Puede ser una dirección, un barrio o una ciudad.</p>
-     <custom-button class="button" color="#D1ADCF">Guardar</custom-button>
-     <custom-button class="button" color="#CDCDCD">Cancelar</custom-button>
+     <span class="status-message"></span>
+     <custom-button class="button save" color="#D1ADCF">Guardar</custom-button>
+     <custom-button class="button cancel" color="#CDCDCD">Cancelar</custom-button>
     </form>
      </div>
     `;

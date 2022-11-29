@@ -1,5 +1,6 @@
 import { index } from "../lib/algolia";
 import * as models from "../models/models";
+import { cloudinary } from "../lib/cloudinary";
 
 export async function createNewReportedPet(petData: {
   name: string;
@@ -7,9 +8,16 @@ export async function createNewReportedPet(petData: {
   last_location_lng: number;
   pictureURL: string;
   userId: number;
+  point_of_reference: string;
 }) {
-  const { name, last_location_lat, last_location_lng, pictureURL, userId } =
-    petData;
+  const {
+    name,
+    last_location_lat,
+    last_location_lng,
+    pictureURL,
+    userId,
+    point_of_reference,
+  } = petData;
 
   if (!name) {
     throw "Falta nombre de mascota";
@@ -27,12 +35,19 @@ export async function createNewReportedPet(petData: {
     throw "Falta userId de mascota";
   }
 
+  const img = await cloudinary.uploader.upload(pictureURL, {
+    resource_type: "image",
+    discard_original_filename: true,
+    width: 1000,
+  });
+
   const reportPet = await models.Pet.create({
     name,
     last_location_lat,
     last_location_lng,
+    point_of_reference,
     status: "lost",
-    pictureURL,
+    pictureURL: img.secure_url,
     userId,
   });
 
@@ -45,6 +60,7 @@ export async function createNewReportedPet(petData: {
     },
     status: reportPet.get("status"),
     userId: reportPet.get("userId"),
+    point_of_reference: reportPet.get("point_of_reference"),
   });
 
   return { reportPet, reportPetAlgolia };

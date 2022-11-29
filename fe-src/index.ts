@@ -7,6 +7,7 @@ import "./pages/report-pet";
 import "./components/header";
 import "./components/button";
 import { state } from "./state";
+
 (function () {
   state.init();
 })();

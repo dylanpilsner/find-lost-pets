@@ -86,4 +86,24 @@ async function updateFirstName(id, updatedName: string) {
   return updatedUser;
 }
 
-export { createUser, verifyEmail, getProfile, updateFirstName };
+async function getMyReportedPets(userId: number) {
+  if (!userId) {
+    throw "id necesario";
+  }
+
+  const myReportedPets = await models.Pet.findAll({
+    where: {
+      userId,
+    },
+  });
+
+  return myReportedPets;
+}
+
+export {
+  createUser,
+  verifyEmail,
+  getProfile,
+  updateFirstName,
+  getMyReportedPets,
+};

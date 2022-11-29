@@ -118,6 +118,7 @@ class Header extends HTMLElement {
           display:flex;
           position:fixed;
           height:100%;
+          z-index:1;
           width:100%;
           top:-2160px;
           left:0;
