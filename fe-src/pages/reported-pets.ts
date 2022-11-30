@@ -24,32 +24,34 @@ class ReportedPets extends HTMLElement {
         display:flex;
         flex-direction:column;
         align-items:center;
-        width:100%;
+        height:100%;
         padding:10px;
       }
       
       .title{
         margin:20px 0;
         font-size:40px;
-        width:100%;
-        align-text:center;
+        text-align:center;
       }
 
+      .subtitle{
+        text-align:center;
 
-      .lost-pet-cards-container {
+      }
+
+      .lost-pet-card-container {
         display:flex;
-        width:100%;
         flex-direction:column;
         gap:20px;
         align-items:center;
       }
   
-      .lost-pet-cards-container:last-child {
+      .lost-pet-card-container:last-child {
         margin-bottom:20px;
       }
   
       @media (min-width:769px){
-        .lost-pet-cards-container{
+        .lost-pet-card-container{
           display:grid;
           gap:50px;
           grid-template-columns:1fr 1fr ;
@@ -57,12 +59,12 @@ class ReportedPets extends HTMLElement {
       }
       
       @media (min-width:1366px){
-        .lost-pet-cards-container{
+        .lost-pet-card-container{
           grid-template-columns:1fr 1fr 1fr;
         }
       }
       
-      
+  
       .card {
         height:234px;
         width:335px;
@@ -105,48 +107,48 @@ class ReportedPets extends HTMLElement {
         text-decoration: underline;
       }
       
-      
       `;
 
     this.innerHTML = /*html*/ `
     <custom-header></custom-header>
     <div class="my-pets-page-container">
-     <h1 class="title">Mis mascotas reportadas</h1>
-     
-     <div class="lost-pet-cards-container">
-        <div class="card">
-          <div class="img-container">
-            <img class="pet-image" src="${husky}" />
-            <div class="pet-information">
-              <div class="main-information-container">
-                <h1 class="pet-name">Bobby</h1>
-                <span class="pet-location">NUÑEZ</span>
-              </div>
-              <a class="report-information-link"
-                >REPORTAR <br />
-                INFORMACIÓN</a
-              >
-            </div>
-          </div>
-        </div>
-        
-     <div class="lost-pet-cards-container">
-        <div class="card">
-          <div class="img-container">
-            <img class="pet-image" src="${husky}" />
-            <div class="pet-information">
-              <div class="main-information-container">
-                <h1 class="pet-name">Bobby</h1>
-                <span class="pet-location">NUÑEZ</span>
-              </div>
-              <a class="report-information-link"
-                >REPORTAR <br />
-                INFORMACIÓN</a
-              >
-            </div>
-          </div>
-        </div>
+      <h1 class="title">Mis mascotas reportadas</h1>
 
+      <div class="lost-pet-card-container">
+      ${
+        petArray.length == 0
+          ? /*html*/ `<h3 class="subtitle">AÚN NO REPORTASTE MASCOTAS PERDIDAS</h3>`
+          : petArray
+              .map((i) => {
+                return /*html*/ `
+                <div class="card">
+                <div class="img-container">
+                  <img class="pet-image" src=${i.pictureURL} />
+                  <div class="pet-information">
+                    <div class="main-information-container">
+                      <h1 class="pet-name">${i.name}</h1>
+                      <span class="pet-location">${i.point_of_reference}</span>
+                    </div>
+                    <a class="report-information-link"
+                      >REPORTAR <br />
+                      INFORMACIÓN</a
+                    >
+                  </div>
+              </div>
+              </div>
+              `;
+              })
+              .join(" ")
+      }
+      </div>
+      </div>
+      
+      
+
+ 
+
+        
+      </div>
     </div>
     `;
 

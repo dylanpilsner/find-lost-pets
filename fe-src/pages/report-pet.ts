@@ -27,6 +27,33 @@ class ReportPet extends HTMLElement {
 
       const searchInput = document.querySelector(".search-location") as any;
       const saveButton = document.querySelector(".button.save");
+
+      const dropzone = document.querySelector(".img-container");
+      const picButton = document.querySelector(".button.pic");
+
+      const myDropzone = new Dropzone(picButton, {
+        url: "/falsa",
+        autoProcessQueue: false,
+        thumbnailWidth: 350,
+        thumbnailHeight: 145,
+        previewsContainer: dropzone,
+      });
+      myDropzone.on("thumbnail", (file) => {
+        picURL = file.dataURL;
+
+        const details = document.querySelector(".dz-details");
+        const successMark = document.querySelector(".dz-success-mark");
+        const errorMark = document.querySelector(".dz-error-mark");
+        if (details) {
+          details.remove();
+        } else {
+          window.alert("por favor, introduzca la imagen nuevamente");
+          location.reload();
+        }
+        successMark.remove();
+        errorMark.remove();
+      });
+
       searchInput.addEventListener("keyup", (e) => {
         e.preventDefault();
         const target = e.target as any;
@@ -72,25 +99,6 @@ class ReportPet extends HTMLElement {
         .addTo();
       map.setCenter(firstResult.geometry.coordinates);
       map.setZoom(17);
-    });
-    const dropzone = document.querySelector(".img-container");
-    const picButton = document.querySelector(".button.pic");
-
-    const myDropzone = new Dropzone(picButton, {
-      url: "/falsa",
-      autoProcessQueue: false,
-      thumbnailWidth: 350,
-      thumbnailHeight: 145,
-      previewsContainer: dropzone,
-    });
-    myDropzone.on("thumbnail", (file) => {
-      picURL = file.dataURL;
-      const details = document.querySelector(".dz-details");
-      const successMark = document.querySelector(".dz-success-mark");
-      const errorMark = document.querySelector(".dz-error-mark");
-      details.remove();
-      successMark.remove();
-      errorMark.remove();
     });
 
     const saveButton = document.querySelector(".button.save");
