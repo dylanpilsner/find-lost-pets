@@ -116,7 +116,7 @@ app.post("/report-lost-pet", authMiddleware, async (req, res) => {
   }
 });
 
-app.get("/get-my-pets", authMiddleware, async (req, res) => {
+app.get("/get-my-reported-pets", authMiddleware, async (req, res) => {
   try {
     const myReportedPets = await userController.getMyReportedPets(req._user.id);
     res.json(myReportedPets);

@@ -5,13 +5,14 @@ class Auth extends HTMLElement {
   connectedCallback() {
     this.render();
   }
-
   signIn(email: string) {
+    const loader = this.querySelector(".loader");
     const signInForm = this.querySelector(".sign-in.form");
     signInForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const target = e.target as any;
       const passwordValue = target.password.value;
+      loader.classList.toggle("active");
       const authentication = await state.authenticate(email, passwordValue);
       if (authentication.token.authenticationCompleted) {
         state.setAccountInformation(email, authentication.token);
@@ -20,13 +21,14 @@ class Auth extends HTMLElement {
         const passwordAlert = this.querySelector(".password-alert");
         passwordAlert.classList.add("active");
         passwordAlert.textContent = "Contraseña incorrecta";
+        loader.classList.toggle("active");
       }
     });
   }
 
   signUp(email) {
+    const loader = this.querySelector(".loader");
     const registerForm = this.querySelector(".register.form") as any;
-
     registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const target = e.target as any;
@@ -34,11 +36,11 @@ class Auth extends HTMLElement {
       const name = target.name.value;
       const confirmPassword = target["confirm-password"].value;
       const passwordAlert = this.querySelector(".password-alert");
-
       if (password != confirmPassword) {
         passwordAlert.classList.add("active");
         passwordAlert.textContent = "Las contraseñas no coinciden";
       } else {
+        loader.classList.toggle("active");
         await state.signUp(email, name, password);
         const authentication = await state.authenticate(email, password);
         state.setAccountInformation(email, authentication.token);
@@ -53,6 +55,8 @@ class Auth extends HTMLElement {
       e.preventDefault();
       const target = e.target as any;
       const emailValue = target.email.value;
+      const loader = this.querySelector(".loader");
+      loader.classList.toggle("active");
       const verifyEmail = await state.verifyEmail(emailValue);
       if (verifyEmail) {
         this.removeChild(param.verifyEmail);
@@ -133,6 +137,14 @@ class Auth extends HTMLElement {
       .password-alert.active{
         display:initial;
       }
+
+      .loader{
+        display:none;
+      }
+
+      .loader.active{
+        display:initial;
+      }
       
       `;
 
@@ -150,7 +162,8 @@ class Auth extends HTMLElement {
      <custom-button class="button">Siguiente</custom-button>
      </button>
      </form>
-    </div>
+     <custom-loader class="loader"></custom-loader>
+     </div>
     </section>
     `;
 
@@ -167,6 +180,7 @@ class Auth extends HTMLElement {
      <custom-button class="button">Siguiente</custom-button>
      </button>
      </form>
+     <custom-loader class="loader"></custom-loader>
     </div>
     `;
 
@@ -191,6 +205,7 @@ class Auth extends HTMLElement {
      <custom-button class="button" id="button">Guardar</custom-button>
      </button>
      </form>
+     <custom-loader class="loader"></custom-loader>
     </div>
     `;
 

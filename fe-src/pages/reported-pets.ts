@@ -1,102 +1,108 @@
 import { Router } from "@vaadin/router";
 import { state } from "../state";
-
+const husky = require("../assets/husky.jpg");
 class ReportedPets extends HTMLElement {
   async connectedCallback() {
     this.render();
   }
 
+  async getMyPets() {
+    const myPets = await state.getMyPets();
+    return myPets;
+  }
+
   addListeners() {}
 
-  render() {
+  async render() {
     const style = document.createElement("style");
+    const petArray = await this.getMyPets();
 
     style.innerHTML =
       /*css*/
       `
-      .auth-page-container{
+      .my-pets-page-container{
         display:flex;
         flex-direction:column;
         align-items:center;
+        width:100%;
         padding:10px;
       }
       
       .title{
         margin:20px 0;
         font-size:40px;
-        // align-self:start;
-      }
-
-      .form {
-        width:90%;
-        display:flex;
-        max-width:500px;
-        flex-direction:column;
-        align-items:center;
-        gap:30px;
-      }
-      .label-form {
-        font-size:16px;
         width:100%;
-        font-weight:500;
+        align-text:center;
       }
 
-      .edit-container{
+
+      .lost-pet-cards-container {
+        display:flex;
+        width:100%;
+        flex-direction:column;
+        gap:20px;
+        align-items:center;
+      }
+  
+      .lost-pet-cards-container:last-child {
+        margin-bottom:20px;
+      }
+  
+      @media (min-width:769px){
+        .lost-pet-cards-container{
+          display:grid;
+          gap:50px;
+          grid-template-columns:1fr 1fr ;
+        }
+      }
+      
+      @media (min-width:1366px){
+        .lost-pet-cards-container{
+          grid-template-columns:1fr 1fr 1fr;
+        }
+      }
+      
+      
+      .card {
+        height:234px;
+        width:335px;
+        border:2px solid black;
+        border-radius:4px;
+        background-color:#D1C1AD;
+      }
+  
+      .img-container {
+        height:147px;
+        width:100%;
+        border-bottom:3px solid black;
+      }
+      .pet-image {
+        height:100%;
+        width:100%;
+        object-fit:cover;
+      }
+  
+      .pet-information {
         display:flex;
         align-items:center;
         justify-content:space-between;
+        padding:0 15px;
       }
-
-      .nombre{
-        align-content:end;
+      .main-information-container {
       }
-
-      .edit{
-        height:25px;
-        align-self:flex-end;
-        margin-right:10px;
-        margin-bottom:5px;
+      .pet-name {
+        margin:0;
+        font-size:40px;
+        height:50px;
       }
-
-      .email {
+      .pet-location {
+        margin:0;
       }
-
-      .data-input {
-        height:70px;
-        border:2px solid black;
-        width:100%;
-        border-radius: 10px;
-        font-size:20px;
-        text-align:center;
-        outline:none;
-      }
-      .data-input:read-only {
-        background-color:#d6d5da;
-      }
-
-      .data-input.name{
-        margin-bottom:30px;
-      }
-
-      .invisible-button{
-        width:100%;
-        border:none;
-        background-color:transparent;
-        margin-bottom:20px;
-      }
-
-      .password-alert{
-        color:#eb4034;
-        font-weight:500;
-        display:none;
-        text-align:center;
-      }
-      .password-alert.active{
-        display:initial;
-      }
-
-      .password-alert.active.success{
-        color:blue;
+      .report-information-link {
+        margin-right:5px;
+        color: #3E91DD;
+        cursor: pointer;
+        text-decoration: underline;
       }
       
       
@@ -104,8 +110,43 @@ class ReportedPets extends HTMLElement {
 
     this.innerHTML = /*html*/ `
     <custom-header></custom-header>
-    <div class="auth-page-container">
+    <div class="my-pets-page-container">
      <h1 class="title">Mis mascotas reportadas</h1>
+     
+     <div class="lost-pet-cards-container">
+        <div class="card">
+          <div class="img-container">
+            <img class="pet-image" src="${husky}" />
+            <div class="pet-information">
+              <div class="main-information-container">
+                <h1 class="pet-name">Bobby</h1>
+                <span class="pet-location">NUÑEZ</span>
+              </div>
+              <a class="report-information-link"
+                >REPORTAR <br />
+                INFORMACIÓN</a
+              >
+            </div>
+          </div>
+        </div>
+        
+     <div class="lost-pet-cards-container">
+        <div class="card">
+          <div class="img-container">
+            <img class="pet-image" src="${husky}" />
+            <div class="pet-information">
+              <div class="main-information-container">
+                <h1 class="pet-name">Bobby</h1>
+                <span class="pet-location">NUÑEZ</span>
+              </div>
+              <a class="report-information-link"
+                >REPORTAR <br />
+                INFORMACIÓN</a
+              >
+            </div>
+          </div>
+        </div>
+
     </div>
     `;
 

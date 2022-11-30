@@ -110,7 +110,6 @@ class Profile extends HTMLElement {
       .title{
         margin:20px 0;
         font-size:40px;
-        // align-self:start;
       }
 
       .form {

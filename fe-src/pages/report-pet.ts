@@ -13,6 +13,7 @@ class ReportPet extends HTMLElement {
   addListeners() {
     let locationCoordinates;
     let picURL;
+    const loader = document.querySelector(".loader");
     function initMap() {
       mapboxgl.accessToken = MAPBOX_TOKEN;
       return new mapboxgl.Map({
@@ -116,6 +117,7 @@ class ReportPet extends HTMLElement {
       }
 
       setTimeout(async () => {
+        loader.classList.toggle("active");
         const newPetData = await state.reportLostPet({
           name: form.name.value,
           last_location_lat: locationCoordinates.lat,
@@ -125,6 +127,7 @@ class ReportPet extends HTMLElement {
         });
         statusMessage.classList.add("success");
         statusMessage.textContent = "Mascota reportada con éxito!";
+        loader.classList.toggle("active");
       }, 500);
     });
 
@@ -261,6 +264,14 @@ class ReportPet extends HTMLElement {
       .status-message.success{
         color:blue;
       }
+
+      .loader{
+        display:none;
+      }
+      
+      .loader.active{
+        display:initial;
+      }
       
       `;
 
@@ -285,7 +296,8 @@ class ReportPet extends HTMLElement {
      <span class="status-message"></span>
      <custom-button class="button save" color="#D1ADCF">Guardar</custom-button>
      <custom-button class="button cancel" color="#CDCDCD">Cancelar</custom-button>
-    </form>
+     </form>
+     <custom-loader class="loader"></custom-loader>
      </div>
     `;
 

@@ -7,6 +7,7 @@ const state = {
     },
     email: "",
     token: "",
+    reportedPets: [],
   },
   listeners: [],
 
@@ -147,6 +148,18 @@ const state = {
     cs.email = email;
     cs.token = token.token;
     this.setState(cs);
+  },
+
+  async getMyPets() {
+    const cs = this.getState();
+    const res = await fetch(`${API_BASE_URL}/get-my-reported-pets`, {
+      headers: {
+        authorization: `bearer ${cs.token}`,
+      },
+    });
+    const data = await res.json();
+
+    return data;
   },
 
   setState(newState: Object) {
