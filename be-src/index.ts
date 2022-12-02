@@ -6,6 +6,7 @@ import * as petController from "./controllers/pet-controller";
 import { authMiddleware } from "./middleware/methods";
 import { User, Auth, Pet } from "./models/models";
 import * as cors from "cors";
+import * as sendgrid from "@sendgrid/mail";
 const app = express();
 const port = process.env.PORT || 3000;
 const staticDirPath = path.resolve(__dirname, "../fe-dist");
@@ -18,13 +19,28 @@ app.use(
 app.use(cors());
 
 app.get("/test", async (req, res) => {
-  const todos = await Pet.findAll();
-  res.json({ todos });
-});
+  sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
+  const msg = {
+    to: "dylan.pilsner@gmail.com",
+    from: "findlostpetsapx@gmail.com", // Use the email address or domain you verified above
+    subject: "Hello World!",
+    text: "Testeando API de Sendgrid",
+    html: "<strong>and easy to do anywhere, even with Node.js</strong>",
+  };
 
-app.delete("/delete", async (req, res) => {
-  const borrar = await User.destroy({ where: { id: req.body.id } });
-  res.json(borrar);
+  const mailsentRes = await sendgrid.send(msg);
+  res.json({ message: "mail enviado", response: mailsentRes });
+
+  // try {
+  //   const test = await sendgrid.send(msg);
+  //   res.json({ test });
+  // } catch (error) {
+  //   console.error(error);
+
+  //   if (error.response) {
+  //     console.error(error.response.body);
+  //   }
+  // }
 });
 
 // sign up/in
@@ -120,6 +136,57 @@ app.get("/get-my-reported-pets", authMiddleware, async (req, res) => {
   try {
     const myReportedPets = await userController.getMyReportedPets(req._user.id);
     res.json(myReportedPets);
+  } catch (err) {
+    res.json({ err });
+  }
+});
+app.put("/pet/:id", authMiddleware, async (req, res) => {
+  const { name, lat, lng, pictureURL, point_of_reference } = req.body;
+  const { id } = req.params;
+
+  try {
+    const updatedPet = await petController.editPet({
+      name,
+      last_location_lat: lat,
+      last_location_lng: lng,
+      pictureURL,
+      point_of_reference,
+      id,
+    });
+    res.json(updatedPet);
+  } catch (err) {
+    res.json({ err });
+  }
+});
+
+app.put("/pet-status/:id", authMiddleware, async (req, res) => {
+  const { status } = req.body;
+  const { id } = req.params;
+
+  try {
+    const updatedStatus = await petController.changetPetStatus(status, id);
+    res.json(updatedStatus);
+  } catch (err) {
+    res.json({ err });
+  }
+});
+
+app.delete("/pet/:id", authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedPet = await petController.deletePost(id);
+    res.json(deletedPet);
+  } catch (err) {
+    res.json({ err });
+  }
+});
+
+app.get("/near-lost-pets", async (req, res) => {
+  const { lat, lng } = req.query;
+
+  try {
+    const foundNearLostPets = await petController.getNearLostPets(lat, lng);
+    res.json(foundNearLostPets);
   } catch (err) {
     res.json({ err });
   }

@@ -22,6 +22,10 @@ router.setRoutes([
     path: "/report-pet",
     component: "report-pet-page",
   },
+  {
+    path: "/edit-pet",
+    component: "edit-pet-page",
+  },
 ]);
 if (location.pathname == "/") {
   Router.go("/home");

@@ -6,45 +6,152 @@ const closeImg = require("../assets/close.png");
 class Home extends HTMLElement {
   connectedCallback() {
     this.render();
+  }
+  name: string;
 
-    //AGREGAR CONDICIONAL, PARA QUE NO APAREZCA EL BOTÓN DE UBICACIÓN EN CASO DE QUE LA GEOLOCALIZACIÓN EN EL STATE SEA DISTINTA A "" !!!!!
+  async addNearLostPets() {
+    const lostPetsContainer = document.createElement("div");
+    const modelContainer = document.createElement("div");
+    const lostPetsSection = document.querySelector(".lost-pets");
+    const loader = document.querySelector(".loader");
+    let modelCardId;
+
+    lostPetsContainer.classList.add("lost-pet-cards-container");
+    loader.classList.toggle("active");
+    const nearLostPets = await state.getNearLostPets();
+    loader.classList.toggle("active");
+    const cs = state.getState();
+    this.name = cs.lastSelectedPet.name;
+    lostPetsContainer.innerHTML = /*html*/ `
+
+    ${nearLostPets
+      .map((i) => {
+        return /*html*/ `
+        <div class="card">
+        <div class="img-container">
+          <img class="pet-image" src="${i.pictureURL}" />
+          <div class="pet-information">
+            <div class="main-information-container">
+              <h1 class="pet-name">${i.name}</h1>
+              <span class="pet-location">${i.point_of_reference}</span>
+            </div>
+            <div class="report-information-container">
+              <span class="report-information-link"
+                >REPORTAR <br />
+                INFORMACIÓN</span
+              >
+              <span class="invisible-id">${i.id}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="report-information id${i.id}">
+        <div class="report-information-modal-card">
+          <div class="modal-head">
+            <img src="${closeImg}" class="close-model" />
+          </div>
+          <div class="informartion-container">
+            <h1 class="title report">Reportar info <br />de ${i.name}</h1>
+          </div>
+          <form class="report-form">
+            <label class="form-label">
+              <div class="field-label">TU NOMBRE</div>
+              <input type="text" class="form-input" name="name" />
+            </label>
+            <label class="form-label">
+              <div class="field-label">TU TELÉFONO</div>
+              <input type="tel" class="form-input" name="phone" />
+            </label>
+  
+            <label class="form-label">
+              <div class="field-label">DÓNDE LO VISTE?</div>
+              <textarea class="form-textarea"></textarea>
+            </label>
+            <custom-button class="button send">Enviar</custom-button>
+          </form>
+          <div class="modal-foot"></div>
+        </div>
+      </div>
+      `;
+      })
+      .join(" ")}
+    
+
+
+    `;
+
+    modelContainer.innerHTML = /*html*/ `
+
+    `;
+
+    lostPetsSection.appendChild(lostPetsContainer);
+
+    const reportInformationButton = lostPetsContainer.querySelectorAll(
+      ".report-information-container"
+    );
+    reportInformationButton.forEach((i) => {
+      i.addEventListener("click", (e) => {
+        const id = i.querySelector(".invisible-id");
+
+        const selectedPet = nearLostPets.filter((i) => {
+          return i.id == id.textContent;
+        });
+        state.setSelectedPet(selectedPet[0]);
+        modelCardId = selectedPet[0].id;
+        const reportModel = this.querySelector(
+          `.report-information.id${modelCardId}`
+        );
+        reportModel.classList.toggle("active");
+      });
+    });
+
+    const closeModel = lostPetsContainer.querySelectorAll(".close-model");
+
+    closeModel.forEach((i) => {
+      i.addEventListener("click", (e) => {
+        const reportModel = lostPetsContainer.querySelector(
+          `.report-information.id${modelCardId}`
+        );
+
+        reportModel.classList.toggle("active");
+      });
+    });
+
+    // closeModel.addEventListener("click", (e) => {
+    //   const reportModel = lostPetsContainer.querySelector(
+    //     `.report-information.${modelCardId}`
+    //   );
+    //   console.log(reportModel);
+
+    //   reportModel.classList.toggle("active");
+    // });
   }
 
   addListeners() {
     const button = this.querySelector(".button");
     button.addEventListener("click", async (e) => {
-      navigator.geolocation.getCurrentPosition(async (geoposition) => {
+      navigator.geolocation.getCurrentPosition((geoposition) => {
         const lat = geoposition.coords.latitude;
         const lng = geoposition.coords.longitude;
         state.setGeolocation(lat, lng);
       });
 
-      // PARA BORRAR UN CONTAINER Y TODO LO QUE ESTÁ DENTRO
       const locationPermission = this.querySelector(
         ".get-location-information"
       );
       locationPermission.remove();
-    });
-
-    const reportInformation = this.querySelectorAll(".report-information-link");
-    reportInformation.forEach((i) => {
-      i.addEventListener("click", (e) => {
-        const cs = state.getState();
-        const reportModel = this.querySelector(".report-information");
-        reportModel.classList.toggle("active");
-      });
-    });
-
-    const closeModel = this.querySelector(".close-model");
-    closeModel.addEventListener("click", (e) => {
-      const reportModel = this.querySelector(".report-information");
-      reportModel.classList.toggle("active");
+      const lostPetContainer = document.querySelector(
+        ".lost-pet-cards-container"
+      );
+      if (lostPetContainer) {
+        lostPetContainer.remove();
+      }
+      await this.addNearLostPets();
     });
   }
 
   render() {
     const style = document.createElement("style");
-
     style.innerHTML =
       /*css*/
       `
@@ -145,8 +252,7 @@ class Home extends HTMLElement {
       justify-content:space-between;
       padding:0 15px;
     }
-    .main-information-container {
-    }
+
     .pet-name {
       margin:0;
       font-size:40px;
@@ -157,9 +263,18 @@ class Home extends HTMLElement {
     }
     .report-information-link {
       margin-right:5px;
-      color: #3E91DD;
+      color: #5f83c7;
       cursor: pointer;
       text-decoration: underline;
+      font-weight:500;
+    }
+
+    .report-information-link:hover{
+      color:#3E91DD;
+    }
+    
+    .invisible-id{
+      display:none;
     }
     
     .report-information{
@@ -253,6 +368,7 @@ class Home extends HTMLElement {
       justify-content:center;
     }
     .form-label {
+      width:80%
     }
     .field-label {
       font-size:16px;
@@ -260,18 +376,29 @@ class Home extends HTMLElement {
     }
     .form-input {
       height:50px;
-      width:280px;
+      width:100%;
       border:2px solid black;
       border-radius:4px;
     }
     .form-textarea {
       height:127px;
-      width:280px;
+      width:100%;
       border:2px solid black;
       border-radius:4px;
     }
     
+    .button.send{
+      width:80%;
+      margin-bottom:15px;
+    }
+
+    .loader{
+      display:none;
+    }
     
+    .loader.active{
+      display:initial;
+    }
     
     `;
 
@@ -288,90 +415,34 @@ class Home extends HTMLElement {
           <custom-button class="button">Dar mi ubicación</custom-button>
         </div>
       </div>
-      <div class="lost-pet-cards-container">
-        <div class="card">
-          <div class="img-container">
-            <img class="pet-image" src="${husky}" />
-            <div class="pet-information">
-              <div class="main-information-container">
-                <h1 class="pet-name">Bobby</h1>
-                <span class="pet-location">NUÑEZ</span>
-              </div>
-              <a class="report-information-link"
-                >REPORTAR <br />
-                INFORMACIÓN</a
-              >
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="img-container">
-            <img class="pet-image" src="${husky}" />
-            <div class="pet-information">
-              <div class="main-information-container">
-                <h1 class="pet-name">Bobby</h1>
-                <span class="pet-location">NUÑEZ</span>
-              </div>
-              <a class="report-information-link"
-                >REPORTAR <br />
-                INFORMACIÓN</a
-              >
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="img-container">
-            <img class="pet-image" src="${husky}" />
-            <div class="pet-information">
-              <div class="main-information-container">
-                <h1 class="pet-name">Bobby</h1>
-                <span class="pet-location">NUÑEZ</span>
-              </div>
-              <a class="report-information-link"
-                >REPORTAR <br />
-                INFORMACIÓN</a
-              >
-            </div>
-          </div>
-        </div>
-
-        <div class="report-information">
-          <div class="report-information-modal-card">
-            <div class="modal-head">
-              <img src="${closeImg}" class="close-model" />
-            </div>
-            <div class="informartion-container">
-              <h1 class="title report">Reportar info <br />de Bobby</h1>
-            </div>
-            <form class="report-form">
-              <label class="form-label">
-                <div class="field-label">TU NOMBRE</div>
-                <input type="text" class="form-input" name="name" />
-              </label>
-              <label class="form-label">
-                <div class="field-label">TU TELÉFONO</div>
-                <input type="tel" class="form-input" name="phone" />
-              </label>
-
-              <label class="form-label">
-                <div class="field-label">DÓNDE LO VISTE?</div>
-                <textarea class="form-textarea"></textarea>
-              </label>
-              <custom-button>Enviar</custom-button>
-            </form>
-            <div class="modal-foot"></div>
-          </div>
-        </div>
-      </div>
+      <custom-loader class="loader"></custom-loader>
     </section>
     `;
 
-    this.appendChild(style);
+    const cs = state.getState();
 
+    this.appendChild(style);
     this.addListeners();
+    if (cs.geolocation.latitude != "" && cs.geolocation.longitude != "") {
+      this.addNearLostPets();
+    }
   }
 }
 
 customElements.define("home-page", Home);
+
+// <div class="card">
+// <div class="img-container">
+//   <img class="pet-image" src="${husky}" />
+//   <div class="pet-information">
+//     <div class="main-information-container">
+//       <h1 class="pet-name">Bobby</h1>
+//       <span class="pet-location">NUÑEZ</span>
+//     </div>
+//     <a class="report-information-link"
+//       >REPORTAR <br />
+//       INFORMACIÓN</a
+//     >
+//   </div>
+// </div>
+// </div>

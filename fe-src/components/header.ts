@@ -26,6 +26,7 @@ class Header extends HTMLElement {
         window.alert(
           "Para ver sus mascotas reportadas, por favor inicie sesión"
         );
+        state.setRedirect("my-reported-pets");
         Router.go("/auth-page");
       } else {
         Router.go("/my-reported-pets");
@@ -35,6 +36,7 @@ class Header extends HTMLElement {
     reportPet.addEventListener("click", (e) => {
       if (cs.token == "") {
         window.alert("Para reportar una mascota, por favor inicie sesión");
+        state.setState("report-pet");
         Router.go("/auth-page");
       } else {
         Router.go("/report-pet");
@@ -83,6 +85,7 @@ class Header extends HTMLElement {
         
         .logo{
           height:55px;
+          cursor:pointer;
         }
 
         .open-nav-menu{

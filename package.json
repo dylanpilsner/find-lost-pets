@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/dylanpilsner/find-lost-pets#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
     "@types/node": "^18.11.9",
     "@vaadin/router": "^1.7.4",
     "algoliasearch": "^4.14.2",

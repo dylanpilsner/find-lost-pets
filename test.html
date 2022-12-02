@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="card">
+      <div class="img-container">
+        <img class="pet-image" src="${i.pictureURL}" />
+        <div class="pet-information">
+          <div class="main-information-container">
+            <h1 class="pet-name">${i.name}</h1>
+            <span class="pet-location">${i.point_of_reference}</span>
+          </div>
+          <div class="report-information-container">
+            <span class="report-information-link"
+              >REPORTAR <br />
+              INFORMACIÓN</span
+            >
+            <span class="invisible-id">${i.id}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="report-information id${i.id}">
+      <div class="report-information-modal-card">
+        <div class="modal-head">
+          <img src="${closeImg}" class="close-model" />
+        </div>
+        <div class="informartion-container">
+          <h1 class="title report">Reportar info <br />de ${i.name}</h1>
+        </div>
+        <form class="report-form">
+          <label class="form-label">
+            <div class="field-label">TU NOMBRE</div>
+            <input type="text" class="form-input" name="name" />
+          </label>
+          <label class="form-label">
+            <div class="field-label">TU TELÉFONO</div>
+            <input type="tel" class="form-input" name="phone" />
+          </label>
+
+          <label class="form-label">
+            <div class="field-label">DÓNDE LO VISTE?</div>
+            <textarea class="form-textarea"></textarea>
+          </label>
+          <custom-button class="button send">Enviar</custom-button>
+        </form>
+        <div class="modal-foot"></div>
+      </div>
+    </div>
+  </body>
+</html>

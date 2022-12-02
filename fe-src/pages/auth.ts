@@ -6,6 +6,7 @@ class Auth extends HTMLElement {
     this.render();
   }
   signIn(email: string) {
+    const cs = state.getState();
     const loader = this.querySelector(".loader");
     const signInForm = this.querySelector(".sign-in.form");
     signInForm.addEventListener("submit", async (e) => {
@@ -16,7 +17,16 @@ class Auth extends HTMLElement {
       const authentication = await state.authenticate(email, passwordValue);
       if (authentication.token.authenticationCompleted) {
         state.setAccountInformation(email, authentication.token);
-        Router.go("/home");
+        if (cs.redirect == "my-reported-pets") {
+          Router.go("/my-reported-pets");
+        }
+        if (cs.redirect == "report-pet") {
+          Router.go("/report-pet");
+        }
+
+        if (cs.redirect == "") {
+          Router.go("/home");
+        }
       } else {
         const passwordAlert = this.querySelector(".password-alert");
         passwordAlert.classList.add("active");

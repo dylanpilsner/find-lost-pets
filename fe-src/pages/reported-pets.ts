@@ -1,6 +1,9 @@
 import { Router } from "@vaadin/router";
 import { state } from "../state";
-const husky = require("../assets/husky.jpg");
+import * as mapboxgl from "mapbox-gl";
+import { MAPBOX_TOKEN, mapboxClient } from "../lib/mapbox";
+import Dropzone from "dropzone";
+const edit = require("../assets/edit.png");
 class ReportedPets extends HTMLElement {
   async connectedCallback() {
     this.render();
@@ -11,12 +14,32 @@ class ReportedPets extends HTMLElement {
     return myPets;
   }
 
-  addListeners() {}
+  getPetInformation(container, array) {
+    const edit = container.querySelectorAll(".edit-information");
+    const petInfo = edit.forEach((i) => {
+      i.addEventListener("click", async (e) => {
+        const id = i.querySelector(".invisible-id");
+        const selectedPet = array.filter((i) => {
+          return i.id == id.textContent;
+        });
+        state.setSelectedPet(selectedPet[0]);
+      });
+    });
+  }
+
+  addListeners(lostPetsContainer) {
+    const editInfo = lostPetsContainer.querySelectorAll(".edit-information");
+
+    editInfo.forEach((i) => {
+      i.addEventListener("click", (e) => {
+        Router.go("/edit-pet");
+      });
+    });
+  }
 
   async render() {
     const style = document.createElement("style");
-    const petArray = await this.getMyPets();
-
+    const myLostPets = document.createElement("div");
     style.innerHTML =
       /*css*/
       `
@@ -89,6 +112,7 @@ class ReportedPets extends HTMLElement {
         align-items:center;
         justify-content:space-between;
         padding:0 15px;
+        max-height:65px;
       }
       .main-information-container {
       }
@@ -99,61 +123,102 @@ class ReportedPets extends HTMLElement {
       }
       .pet-location {
         margin:0;
+        word-break:break-word;
       }
-      .report-information-link {
+      .edit-information {
         margin-right:5px;
-        color: #3E91DD;
         cursor: pointer;
-        text-decoration: underline;
+        display:flex;
+        flex-direction:column;
+        gap:5px;
+      }
+
+      .edit{
+        height:30px;
+        width:30px;
+        align-self:end;
+        margin-top:15px;
       }
       
+      .status{
+        margin:0;
+      }
+      
+      .status.span.lost{
+        color:red;
+      }
+      .status.span.found{
+        color:green;
+      }
+      
+      .invisible-id{
+        display:none;
+      }
+
+      .loader{
+        height:100%;
+        margin:100px 0;
+      }
       `;
 
     this.innerHTML = /*html*/ `
     <custom-header></custom-header>
     <div class="my-pets-page-container">
       <h1 class="title">Mis mascotas reportadas</h1>
-
-      <div class="lost-pet-card-container">
-      ${
-        petArray.length == 0
-          ? /*html*/ `<h3 class="subtitle">AÚN NO REPORTASTE MASCOTAS PERDIDAS</h3>`
-          : petArray
-              .map((i) => {
-                return /*html*/ `
-                <div class="card">
-                <div class="img-container">
-                  <img class="pet-image" src=${i.pictureURL} />
-                  <div class="pet-information">
-                    <div class="main-information-container">
-                      <h1 class="pet-name">${i.name}</h1>
-                      <span class="pet-location">${i.point_of_reference}</span>
-                    </div>
-                    <a class="report-information-link"
-                      >REPORTAR <br />
-                      INFORMACIÓN</a
-                    >
-                  </div>
-              </div>
-              </div>
-              `;
-              })
-              .join(" ")
-      }
-      </div>
-      </div>
-      
-      
-
- 
-
-        
-      </div>
+      <custom-loader class="loader"></custom-loader>
     </div>
     `;
 
     this.appendChild(style);
-    this.addListeners();
+    const petArray = await this.getMyPets();
+    const petPageContainer = this.querySelector(".my-pets-page-container");
+    const loader = this.querySelector(".loader");
+    loader.remove();
+
+    myLostPets.innerHTML = /*html*/ `
+    ${
+      petArray.length == 0
+        ? /*html*/ `<h3 class="subtitle">AÚN NO REPORTASTE MASCOTAS PERDIDAS</h3>`
+        : /*html*/ `
+        <div class="lost-pet-card-container">
+        ${petArray
+          .map((i) => {
+            return /*html*/ `
+            <div class="card">
+            <div class="img-container">
+              <img class="pet-image" src="${i.pictureURL}" />
+              <div class="pet-information">
+                <div class="main-information-container">
+                  <h1 class="pet-name">${i.name}</h1>
+                  <span class="pet-location">${i.point_of_reference}</span>
+                </div>
+                <div class="edit-information">
+                  <img class="edit" src="${edit}" />
+                <div class="invisible-id">${i.id}</div>
+                <p class="status">Estado:
+                <span class="status span ${
+                  i.status == "lost" ? "lost" : "found"
+                }">
+                ${i.status == "lost" ? "Perdido" : "Encontrado"}
+                </span>
+                </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          `;
+          })
+          .join(" ")}
+        </div>
+        `
+    }
+    `;
+
+    const petInfo = this.getPetInformation(myLostPets, petArray);
+
+    this.addListeners(myLostPets);
+
+    petPageContainer.appendChild(myLostPets);
   }
 }
 

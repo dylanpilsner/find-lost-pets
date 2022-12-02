@@ -7,7 +7,8 @@ const state = {
     },
     email: "",
     token: "",
-    reportedPets: [],
+    redirect: "",
+    lastSelectedPet: "",
   },
   listeners: [],
 
@@ -32,11 +33,6 @@ const state = {
     });
     const data = await res.json();
     return data;
-    // params.name.value = data.first_name;
-    // params.password.value = data.password.slice(0, 16);
-    // params.confirmPassword.value = data.password.slice(0, 16);
-
-    // console.log(data);
   },
 
   setGeolocation(lat: number, lng: number) {
@@ -60,6 +56,39 @@ const state = {
     return data.verifiedEmail;
   },
 
+  setSelectedPet(petInfo) {
+    const cs = this.getState();
+    cs.lastSelectedPet = petInfo;
+    this.setState(cs);
+  },
+
+  async editPet(newData: {
+    name: string;
+    lat: number;
+    lng: number;
+    pictureURL: string;
+    point_of_reference: string;
+  }) {
+    const cs = this.getState();
+    const lastSelectedPet = cs.lastSelectedPet;
+    const res = await fetch(`${API_BASE_URL}/pet/${lastSelectedPet.id}`, {
+      method: "put",
+      headers: {
+        "content-type": "application/json",
+        authorization: `bearer ${cs.token}`,
+      },
+      body: JSON.stringify({
+        name: newData.name,
+        lat: newData.lat,
+        lng: newData.lng,
+        pictureURL: newData.pictureURL,
+        point_of_reference: newData.point_of_reference,
+      }),
+    });
+    const data = await res.json();
+    return data;
+  },
+
   async updateName(first_name: string) {
     const cs = this.getState();
     const res = await fetch(`${API_BASE_URL}/update-name`, {
@@ -80,6 +109,44 @@ const state = {
         Authorization: `bearer ${cs.token}`,
       },
       body: JSON.stringify({ password }),
+    });
+    const data = await res.json();
+    return data;
+  },
+
+  setRedirect(page: string) {
+    const cs = this.getState();
+    cs.redirect = page;
+    this.setState(cs);
+  },
+
+  async updateStatus(status: string) {
+    const cs = this.getState();
+    const lastSelectedPet = cs.lastSelectedPet;
+    const res = await fetch(
+      `${API_BASE_URL}/pet-status/${lastSelectedPet.id}`,
+      {
+        method: "put",
+        headers: {
+          "content-type": "application/json",
+          authorization: `bearer ${cs.token}`,
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
+    const data = await res.json();
+    return data;
+  },
+  async deletePost() {
+    const cs = this.getState();
+    const lastSelectedPet = cs.lastSelectedPet;
+    const res = await fetch(`${API_BASE_URL}/pet/${lastSelectedPet.id}`, {
+      method: "delete",
+      headers: {
+        "content-type": "application/json",
+        authorization: `bearer ${cs.token}`,
+      },
+      body: JSON.stringify({ status }),
     });
     const data = await res.json();
     return data;
@@ -140,7 +207,22 @@ const state = {
     const cs = this.getState();
     cs.email = "";
     cs.token = "";
-    this.setState(cs);
+    cs.redirect = "";
+    cs.lastSelectedPet = "";
+    (cs.geolocation.latitude = ""),
+      (cs.geolocation.longitude = ""),
+      this.setState(cs);
+  },
+
+  async getNearLostPets() {
+    const cs = this.getState();
+
+    const res = await fetch(
+      `${API_BASE_URL}/near-lost-pets?lat=${cs.geolocation.latitude}&lng=${cs.geolocation.longitude}`
+    );
+    const data = await res.json();
+
+    return data;
   },
 
   setAccountInformation(email: string, token) {

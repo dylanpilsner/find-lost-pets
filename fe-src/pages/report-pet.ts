@@ -3,8 +3,6 @@ import { state } from "../state";
 import * as mapboxgl from "mapbox-gl";
 import { MAPBOX_TOKEN, mapboxClient } from "../lib/mapbox";
 import Dropzone from "dropzone";
-const defaultImage = require("../assets/default-image.png");
-const husky = require("../assets/husky.jpg");
 class ReportPet extends HTMLElement {
   async connectedCallback() {
     this.render();
@@ -21,38 +19,42 @@ class ReportPet extends HTMLElement {
         style: "mapbox://styles/mapbox/streets-v11",
       });
     }
+    const dropzone = document.querySelector(".img");
+    const picButton = document.querySelector(".button.pic");
+    const hiddenInput = document.querySelector(".dz-hidden-input");
 
+    // Para que no arroje error al ir de edit-pet a report-pet
+
+    if (hiddenInput) {
+      location.reload();
+    }
+
+    const myDropzone = new Dropzone(picButton, {
+      url: "/falsa",
+      autoProcessQueue: false,
+      thumbnailWidth: 350,
+      thumbnailHeight: 145,
+      previewsContainer: dropzone,
+    });
+    myDropzone.on("thumbnail", (file) => {
+      picURL = file.dataURL;
+
+      const details = document.querySelector(".dz-details");
+      const successMark = document.querySelector(".dz-success-mark");
+      const errorMark = document.querySelector(".dz-error-mark");
+      const dropzoneChilds = dropzone.childElementCount;
+      if (dropzoneChilds > 1) {
+        dropzone.firstChild.remove();
+      }
+      details.remove();
+      successMark.remove();
+      errorMark.remove();
+    });
     function initSearchForm(callback) {
       const form = document.querySelector(".form") as any;
 
       const searchInput = document.querySelector(".search-location") as any;
       const saveButton = document.querySelector(".button.save");
-
-      const dropzone = document.querySelector(".img-container");
-      const picButton = document.querySelector(".button.pic");
-
-      const myDropzone = new Dropzone(picButton, {
-        url: "/falsa",
-        autoProcessQueue: false,
-        thumbnailWidth: 350,
-        thumbnailHeight: 145,
-        previewsContainer: dropzone,
-      });
-      myDropzone.on("thumbnail", (file) => {
-        picURL = file.dataURL;
-
-        const details = document.querySelector(".dz-details");
-        const successMark = document.querySelector(".dz-success-mark");
-        const errorMark = document.querySelector(".dz-error-mark");
-        if (details) {
-          details.remove();
-        } else {
-          window.alert("por favor, introduzca la imagen nuevamente");
-          location.reload();
-        }
-        successMark.remove();
-        errorMark.remove();
-      });
 
       searchInput.addEventListener("keyup", (e) => {
         e.preventDefault();
@@ -73,7 +75,6 @@ class ReportPet extends HTMLElement {
         }
       });
       saveButton.addEventListener("click", (e) => {
-        const target = e.target as any;
         if (!locationCoordinates && form["search-location"].value != "") {
           mapboxClient.geocodeForward(
             searchInput.value,
@@ -103,6 +104,8 @@ class ReportPet extends HTMLElement {
 
     const saveButton = document.querySelector(".button.save");
     const cancelButton = document.querySelector(".button.cancel");
+    const goHomeButton = document.querySelector(".button.go-home");
+
     saveButton.addEventListener("click", async (e) => {
       const form = document.querySelector(".form") as any;
       const statusMessage = document.querySelector(".status-message");
@@ -126,6 +129,8 @@ class ReportPet extends HTMLElement {
 
       setTimeout(async () => {
         loader.classList.toggle("active");
+        saveButton.remove();
+        cancelButton.remove();
         const newPetData = await state.reportLostPet({
           name: form.name.value,
           last_location_lat: locationCoordinates.lat,
@@ -136,10 +141,15 @@ class ReportPet extends HTMLElement {
         statusMessage.classList.add("success");
         statusMessage.textContent = "Mascota reportada con éxito!";
         loader.classList.toggle("active");
+        goHomeButton.classList.toggle("active");
       }, 500);
     });
 
     cancelButton.addEventListener("click", (e) => {
+      Router.go("/home");
+    });
+
+    goHomeButton.addEventListener("click", (e) => {
       Router.go("/home");
     });
   }
@@ -206,6 +216,8 @@ class ReportPet extends HTMLElement {
         height:150px;
         border:2.5px solid black;
         border-radius:4px;
+        overflow:hidden;
+
     }
 
       @media (min-width:769px){
@@ -217,7 +229,6 @@ class ReportPet extends HTMLElement {
       .pet-img {
         width:100%;
         height:100%;
-        object-fit:cover;
       }
       
       .dz-preview.dz-image-preview {
@@ -229,6 +240,13 @@ class ReportPet extends HTMLElement {
         width:100%;
         height:100%;
       }
+
+
+      .img{
+        height:100%;
+        width:100%;
+      }
+      
 
       img[data-dz-thumbnail]{
         width:100%;
@@ -280,6 +298,13 @@ class ReportPet extends HTMLElement {
       .loader.active{
         display:initial;
       }
+
+      .button.go-home{
+        display:none;
+      }
+      .button.go-home.active{
+        display:initial;
+      }
       
       `;
 
@@ -293,6 +318,7 @@ class ReportPet extends HTMLElement {
      <input placeholder="Ingresa el nombre de tu mascota" type="text" class="data-input name" name="name" required/>
      </label>
       <div class="img-container">
+      <div class="img"></div>
       </div>
       <custom-button color="#D1ADCF" class="button pic">Agregar/modificar foto</custom-button>
      <div id="map" class="map" style="width: 100%; height: 250px"></div>
@@ -304,6 +330,7 @@ class ReportPet extends HTMLElement {
      <span class="status-message"></span>
      <custom-button class="button save" color="#D1ADCF">Guardar</custom-button>
      <custom-button class="button cancel" color="#CDCDCD">Cancelar</custom-button>
+     <custom-button class="button go-home">Ir a la home</custom-button>
      </form>
      <custom-loader class="loader"></custom-loader>
      </div>
