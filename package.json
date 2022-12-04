@@ -2,7 +2,6 @@
   "name": "find-lost-pets",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "dev:be": "nodemon --watch ./be-src/index.ts  --exec ts-node ./be-src/dev.ts",
     "dev:fe": "parcel serve ./fe-src/index.html --dist-dir fe-dist",
