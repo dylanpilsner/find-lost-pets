@@ -77,7 +77,6 @@ class EditPet extends HTMLElement {
     });
 
     //MAP SECTION
-    // const searchLocation = document.querySelector(".search-location");
 
     const searchInput = document.querySelector(".search-location") as any;
     const saveButton = document.querySelector(".button.save") as any;
@@ -205,6 +204,8 @@ class EditPet extends HTMLElement {
       loader.classList.toggle("active");
       await state.deletePost();
       loader.classList.toggle("active");
+      statusMessage.classList.add("success");
+      statusMessage.textContent = "Mascota despublicada con éxito!";
       goHomeButton.classList.toggle("active");
     });
 

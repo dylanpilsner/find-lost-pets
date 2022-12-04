@@ -1,27 +1,37 @@
-import { Router } from "@vaadin/router";
 import { state } from "../state";
-const husky = require("../assets/husky.jpg");
 const closeImg = require("../assets/close.png");
 
 class Home extends HTMLElement {
   connectedCallback() {
+    state.subscribe(async () => {
+      const lostPetsContainer = document.querySelector(
+        ".lost-pet-cards-container"
+      );
+      const noNearPets = document.querySelector(".no-near-pets-container");
+
+      if (!lostPetsContainer && !noNearPets && location.pathname == "/home") {
+        await this.addNearLostPets();
+      }
+    });
     this.render();
   }
-  name: string;
 
   async addNearLostPets() {
     const lostPetsContainer = document.createElement("div");
-    const modelContainer = document.createElement("div");
+    const noNearPets = document.createElement("div");
     const lostPetsSection = document.querySelector(".lost-pets");
     const loader = document.querySelector(".loader");
     let modelCardId;
-
     lostPetsContainer.classList.add("lost-pet-cards-container");
+    noNearPets.classList.add("no-near-pets-container");
     loader.classList.toggle("active");
     const nearLostPets = await state.getNearLostPets();
     loader.classList.toggle("active");
-    const cs = state.getState();
-    this.name = cs.lastSelectedPet.name;
+
+    noNearPets.innerHTML = /*html*/ `
+    <h3 class="no-near-pets">No hay mascotas perdidas cerca de tu ubicación</h3>
+    `;
+
     lostPetsContainer.innerHTML = /*html*/ `
 
     ${nearLostPets
@@ -56,18 +66,22 @@ class Home extends HTMLElement {
           <form class="report-form">
             <label class="form-label">
               <div class="field-label">TU NOMBRE</div>
-              <input type="text" class="form-input" name="name" />
+              <input type="text" class="form-input" name="name" required />
             </label>
             <label class="form-label">
               <div class="field-label">TU TELÉFONO</div>
-              <input type="tel" class="form-input" name="phone" />
+              <input type="number" class="form-input" name="phone" required />
             </label>
   
             <label class="form-label">
               <div class="field-label">DÓNDE LO VISTE?</div>
-              <textarea class="form-textarea"></textarea>
+              <textarea class="form-textarea" name="description" required></textarea>
             </label>
+            <custom-loader class="report-loader id${i.id}"></custom-loader>
+            <span class="status-message id${i.id}"></span>
+            <button class="invisible-button">
             <custom-button class="button send">Enviar</custom-button>
+            </button>
           </form>
           <div class="modal-foot"></div>
         </div>
@@ -75,16 +89,13 @@ class Home extends HTMLElement {
       `;
       })
       .join(" ")}
-    
-
-
     `;
 
-    modelContainer.innerHTML = /*html*/ `
-
-    `;
-
-    lostPetsSection.appendChild(lostPetsContainer);
+    if (nearLostPets.length == 0) {
+      lostPetsSection.appendChild(noNearPets);
+    } else {
+      lostPetsSection.appendChild(lostPetsContainer);
+    }
 
     const reportInformationButton = lostPetsContainer.querySelectorAll(
       ".report-information-container"
@@ -117,14 +128,31 @@ class Home extends HTMLElement {
       });
     });
 
-    // closeModel.addEventListener("click", (e) => {
-    //   const reportModel = lostPetsContainer.querySelector(
-    //     `.report-information.${modelCardId}`
-    //   );
-    //   console.log(reportModel);
+    const forms = document.querySelectorAll(".report-form");
+    forms.forEach((i) => {
+      i.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const target = e.target as any;
+        const petId = state.getState().lastSelectedPet.id;
+        const reportLoader = document.querySelector(
+          `.report-loader.id${petId}`
+        );
+        const statusMessage = document.querySelector(
+          `.status-message.id${petId}`
+        );
 
-    //   reportModel.classList.toggle("active");
-    // });
+        reportLoader.classList.toggle("active");
+        const email = await state.sendLastSeenReport(
+          target.phone.value,
+          target.description.value,
+          target.name.value
+        );
+        reportLoader.classList.toggle("active");
+        statusMessage.classList.toggle("active");
+        statusMessage.textContent = "Reporte enviado con éxito!";
+        target.reset();
+      });
+    });
   }
 
   addListeners() {
@@ -140,13 +168,6 @@ class Home extends HTMLElement {
         ".get-location-information"
       );
       locationPermission.remove();
-      const lostPetContainer = document.querySelector(
-        ".lost-pet-cards-container"
-      );
-      if (lostPetContainer) {
-        lostPetContainer.remove();
-      }
-      await this.addNearLostPets();
     });
   }
 
@@ -201,6 +222,11 @@ class Home extends HTMLElement {
       max-width:600px;
     }
 
+
+    .no-near-pets{
+      margin-left:20px;
+    }
+    
     .lost-pet-cards-container {
       display:flex;
       flex-direction:column;
@@ -379,16 +405,28 @@ class Home extends HTMLElement {
       width:100%;
       border:2px solid black;
       border-radius:4px;
+      font-family:Poppins;
+      font-size:16px;
     }
     .form-textarea {
+      font-family:Poppins;
+      font-size:16px;
       height:127px;
       width:100%;
       border:2px solid black;
       border-radius:4px;
     }
+
+    .invisible-button{
+      width:80%;
+      background-color:transparent;
+      border:none;
+      margin-bottom:20px;
+    }
+    
     
     .button.send{
-      width:80%;
+      width:100%;
       margin-bottom:15px;
     }
 
@@ -400,8 +438,24 @@ class Home extends HTMLElement {
       display:initial;
     }
     
-    `;
+    .report-loader{
+      display:none;
+    }
+    .report-loader.active{
+      display:initial;
+    }
 
+
+    .status-message{
+      display:none;
+    }
+
+    .status-message.active{
+      display:initial;
+      color:green;
+    }
+    
+    `;
     this.innerHTML = /*html*/ `
     <custom-header></custom-header>
     <section class="lost-pets">
@@ -430,19 +484,3 @@ class Home extends HTMLElement {
 }
 
 customElements.define("home-page", Home);
-
-// <div class="card">
-// <div class="img-container">
-//   <img class="pet-image" src="${husky}" />
-//   <div class="pet-information">
-//     <div class="main-information-container">
-//       <h1 class="pet-name">Bobby</h1>
-//       <span class="pet-location">NUÑEZ</span>
-//     </div>
-//     <a class="report-information-link"
-//       >REPORTAR <br />
-//       INFORMACIÓN</a
-//     >
-//   </div>
-// </div>
-// </div>

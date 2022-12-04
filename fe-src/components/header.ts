@@ -36,7 +36,7 @@ class Header extends HTMLElement {
     reportPet.addEventListener("click", (e) => {
       if (cs.token == "") {
         window.alert("Para reportar una mascota, por favor inicie sesión");
-        state.setState("report-pet");
+        state.setRedirect("report-pet");
         Router.go("/auth-page");
       } else {
         Router.go("/report-pet");

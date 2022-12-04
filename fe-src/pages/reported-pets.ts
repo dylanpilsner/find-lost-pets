@@ -1,8 +1,5 @@
 import { Router } from "@vaadin/router";
 import { state } from "../state";
-import * as mapboxgl from "mapbox-gl";
-import { MAPBOX_TOKEN, mapboxClient } from "../lib/mapbox";
-import Dropzone from "dropzone";
 const edit = require("../assets/edit.png");
 class ReportedPets extends HTMLElement {
   async connectedCallback() {

@@ -1,5 +1,5 @@
 import * as models from "../models/models";
-import { hashPassword } from "../middleware/methods";
+import { hashPassword } from "../middleware/hash-password";
 
 async function createUser(userInformation: {
   email: string;

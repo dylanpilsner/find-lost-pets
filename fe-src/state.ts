@@ -244,6 +244,39 @@ const state = {
     return data;
   },
 
+  async sendLastSeenReport(
+    phone: number,
+    description: string,
+    senderName: string
+  ) {
+    const cs = this.getState();
+    const res = await fetch(`${API_BASE_URL}/report-last-seen`, {
+      method: "post",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        phone,
+        description,
+        senderName,
+        userId: cs.lastSelectedPet.userId,
+        petImage: cs.lastSelectedPet.pictureURL,
+      }),
+    });
+    const data = await res.json();
+    return data;
+  },
+
+  async recoverPassword(email: string) {
+    const res = await fetch(`${API_BASE_URL}/recover-password`, {
+      method: "post",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+  },
+
   setState(newState: Object) {
     this.data = newState;
     for (const cb of this.listeners) {

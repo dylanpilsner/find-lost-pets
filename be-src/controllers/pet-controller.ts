@@ -1,8 +1,6 @@
 import { index } from "../lib/algolia";
 import * as models from "../models/models";
 import { cloudinary } from "../lib/cloudinary";
-import { parse } from "path";
-import { INTEGER } from "sequelize";
 
 export async function createNewReportedPet(petData: {
   name: string;

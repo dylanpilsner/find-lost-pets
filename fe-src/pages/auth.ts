@@ -28,7 +28,7 @@ class Auth extends HTMLElement {
           Router.go("/home");
         }
       } else {
-        const passwordAlert = this.querySelector(".password-alert");
+        const passwordAlert = this.querySelector(".status-message");
         passwordAlert.classList.add("active");
         passwordAlert.textContent = "Contraseña incorrecta";
         loader.classList.toggle("active");
@@ -45,7 +45,7 @@ class Auth extends HTMLElement {
       const password = target.password.value;
       const name = target.name.value;
       const confirmPassword = target["confirm-password"].value;
-      const passwordAlert = this.querySelector(".password-alert");
+      const passwordAlert = this.querySelector(".status-message");
       if (password != confirmPassword) {
         passwordAlert.classList.add("active");
         passwordAlert.textContent = "Las contraseñas no coinciden";
@@ -64,6 +64,7 @@ class Auth extends HTMLElement {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const target = e.target as any;
+      const statusMessage = document.querySelector(".status-message");
       const emailValue = target.email.value;
       const loader = this.querySelector(".loader");
       loader.classList.toggle("active");
@@ -72,6 +73,19 @@ class Auth extends HTMLElement {
         this.removeChild(param.verifyEmail);
         this.appendChild(param.signIn);
         this.signIn(emailValue);
+        const recoverPassword = document.querySelector(".recover-password");
+        recoverPassword.addEventListener("click", async (e) => {
+          const statusMessage = document.querySelector(".status-message");
+          const loader = document.querySelector(".loader");
+
+          loader.classList.toggle("active");
+          await state.recoverPassword(emailValue);
+          statusMessage.classList.add("active");
+          statusMessage.classList.add("ok");
+          statusMessage.textContent =
+            "Recibirás un email con tu nueva contraseña para poder ingresar a tu cuenta";
+          loader.classList.toggle("active");
+        });
       } else {
         this.removeChild(param.verifyEmail);
         this.appendChild(param.register);
@@ -139,12 +153,19 @@ class Auth extends HTMLElement {
         margin-bottom:20px;
       }
 
-      .password-alert{
+      .status-message{
         color:#eb4034;
         font-weight:500;
         display:none;
+        text-align:center;
       }
-      .password-alert.active{
+
+
+      .status-message.ok{
+        color:blue;
+      }
+      
+      .status-message.active{
         display:initial;
       }
 
@@ -155,6 +176,17 @@ class Auth extends HTMLElement {
       .loader.active{
         display:initial;
       }
+      
+      .recover-password{
+        text-decoration:underline;
+        color: #5f83c7;
+        cursor:pointer;
+      }
+      .recover-password:hover{
+        color:#3E91DD;
+    }
+
+      
       
       `;
 
@@ -185,12 +217,13 @@ class Auth extends HTMLElement {
      <div class="password">CONTRASEÑA</div>
      <input type="password" class="sign-input" name="password" required/>
      </label>
-     <span class="password-alert"></span>
+     <span class="status-message"></span>
+     <custom-loader class="loader"></custom-loader>
+     <span class="recover-password">Olvidé mi contraseña</span>
      <button class="invisible-button">
      <custom-button class="button">Siguiente</custom-button>
      </button>
      </form>
-     <custom-loader class="loader"></custom-loader>
     </div>
     `;
 
@@ -210,7 +243,7 @@ class Auth extends HTMLElement {
      <div class="email">REPETIR CONTRASEÑA</div>
      <input type="password" class="sign-input confirm-password" name="confirm-password" required/>
      </label>
-     <span class="password-alert"></span>
+     <span class="status-message"></span>
      <button class="invisible-button">
      <custom-button class="button" id="button">Guardar</custom-button>
      </button>

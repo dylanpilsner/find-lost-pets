@@ -3,14 +3,13 @@ import * as path from "path";
 import * as userController from "./controllers/user-controller";
 import * as authController from "./controllers/auth-controller";
 import * as petController from "./controllers/pet-controller";
-import { authMiddleware } from "./middleware/methods";
-import { User, Auth, Pet } from "./models/models";
+import * as reportController from "./controllers/report-controller";
+import { authMiddleware } from "./middleware/token-auth";
 import * as cors from "cors";
-import * as sendgrid from "@sendgrid/mail";
+
 const app = express();
 const port = process.env.PORT || 3000;
 const staticDirPath = path.resolve(__dirname, "../fe-dist");
-
 app.use(
   express.json({
     limit: "50mb",
@@ -18,32 +17,8 @@ app.use(
 );
 app.use(cors());
 
-app.get("/test", async (req, res) => {
-  sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
-  const msg = {
-    to: "dylan.pilsner@gmail.com",
-    from: "findlostpetsapx@gmail.com", // Use the email address or domain you verified above
-    subject: "Hello World!",
-    text: "Testeando API de Sendgrid",
-    html: "<strong>and easy to do anywhere, even with Node.js</strong>",
-  };
-
-  const mailsentRes = await sendgrid.send(msg);
-  res.json({ message: "mail enviado", response: mailsentRes });
-
-  // try {
-  //   const test = await sendgrid.send(msg);
-  //   res.json({ test });
-  // } catch (error) {
-  //   console.error(error);
-
-  //   if (error.response) {
-  //     console.error(error.response.body);
-  //   }
-  // }
-});
-
 // sign up/in
+
 app.post("/user", async (req, res) => {
   const body = req.body;
   try {
@@ -70,11 +45,6 @@ app.post("/verify-user", async (req, res) => {
   } catch (err) {
     res.json({ err });
   }
-});
-
-app.get("/user", async (req, res) => {
-  const todos = await User.findAll();
-  res.json({ todos });
 });
 
 app.get("/profile", authMiddleware, async (req, res) => {
@@ -187,6 +157,33 @@ app.get("/near-lost-pets", async (req, res) => {
   try {
     const foundNearLostPets = await petController.getNearLostPets(lat, lng);
     res.json(foundNearLostPets);
+  } catch (err) {
+    res.json({ err });
+  }
+});
+
+app.post("/report-last-seen", async (req, res) => {
+  const { phone, description, senderName, userId, petImage } = req.body;
+
+  try {
+    const lastSeenEmail = await reportController.reportPet({
+      phone,
+      description,
+      senderName,
+      userId,
+      petImage,
+    });
+    res.json({ message: "email sent" });
+  } catch (err) {
+    res.json({ err });
+  }
+});
+
+app.post("/recover-password", async (req, res) => {
+  const { email } = req.body;
+  try {
+    const recoverEmail = await authController.recoverPassword(email);
+    res.json({ message: "email sent" });
   } catch (err) {
     res.json({ err });
   }
