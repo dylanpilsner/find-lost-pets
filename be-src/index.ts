@@ -195,7 +195,7 @@ app.listen(port, () => {
   console.log(`server running on port ${port}`);
 });
 
-app.use(express.static(path.join(__dirname, "../fe-dist")));
+app.use(express.static(path.join(__dirname, "../../fe-dist")));
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../../fe-dist/index.html"));
 });
