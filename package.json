@@ -9,7 +9,7 @@
     "build:fe": "parcel build ./fe-src/index.html --dist-dir fe-dist",
     "build": "npm run build:be && npm run build:fe",
     "sync": "ts-node ./be-src/sync.ts",
-    "start": "node ./be-dist/be-src/index.js"
+    "start": "node ./be-dist/index.js"
   },
   "repository": {
     "type": "git",
