@@ -195,7 +195,7 @@ class Profile extends HTMLElement {
      <label class="label-form">
      <div class="edit-container">
      <div class="nombre">NOMBRE</div>
-     <img class="edit name" src=${edit}/>
+     <img class="edit name" src="${edit}"/>
      </div>
      <input placeholder="Ingresa tu nombre" type="text" class="data-input name" name="name" required readonly/>
      </label>

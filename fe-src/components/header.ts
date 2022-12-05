@@ -204,19 +204,19 @@ class Header extends HTMLElement {
     header.innerHTML =
       /*html*/
       `
-     <img class="logo" src=${logo} />
+     <img class="logo" src="${logo}" />
      <div class="open-nav-menu">
      <div class="hamburger-top-bread"></div>
      <div class="hamburger-top-patty"></div>
      <div class="hamburger-bottom-bread"></div>
      </div>
      <nav class=nav-menu>
-     <img class="close-nav-menu" src=${closeImg}/>
+     <img class="close-nav-menu" src="${closeImg}"/>
      <nav class="nav-item my-data">Mis datos</nav>
      <nav class="nav-item my-reported-pets">Mis mascotas reportadas</nav>
      <nav class="nav-item report-pet">Reportar mascota</nav>
      <div class="account-container">
-     <img class="user-img" src=${user} />
+     <img class="user-img" src="${user}" />
      <span class="user">${cs.email == "" ? "Invitadx" : cs.email}</span>
      </div>
      <div class="sign">${
