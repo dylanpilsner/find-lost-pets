@@ -7,8 +7,6 @@ import * as reportController from "./controllers/report-controller";
 import { authMiddleware } from "./middleware/token-auth";
 import * as cors from "cors";
 
-console.log(__dirname);
-
 const app = express();
 const port = process.env.PORT || 3000;
 const staticDirPath = path.resolve(__dirname, "../fe-dist");
@@ -18,6 +16,8 @@ app.use(
   })
 );
 app.use(cors());
+
+console.log(path.join(__dirname, "../fe-dist"));
 
 // sign up/in
 
@@ -197,5 +197,5 @@ app.listen(port, () => {
 
 app.use(express.static(path.join(__dirname, "../fe-dist")));
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../fe-dist/index.html"));
+  res.sendFile(path.join(__dirname, "../../fe-dist/index.html"));
 });
