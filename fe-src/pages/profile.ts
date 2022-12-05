@@ -202,7 +202,7 @@ class Profile extends HTMLElement {
      <label class="label-form">
      <div class="edit-container">
      <div class="email">CONTRASEÑA</div>
-     <img class="edit password" src=${edit}/>
+     <img class="edit password" src="${edit}"/>
      </div>
      <input type="password" class="data-input password" name="password" required readonly />
      </label>
