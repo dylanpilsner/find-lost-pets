@@ -38,7 +38,6 @@ class ReportPet extends HTMLElement {
     });
     myDropzone.on("thumbnail", (file) => {
       picURL = file.dataURL;
-      console.log(picURL);
 
       const details = document.querySelector(".dz-details");
       const successMark = document.querySelector(".dz-success-mark");
