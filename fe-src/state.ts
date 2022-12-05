@@ -92,7 +92,7 @@ const state = {
   async updateName(first_name: string) {
     const cs = this.getState();
     const res = await fetch(`${API_BASE_URL}/update-name`, {
-      method: "post",
+      method: "put",
       headers: {
         "content-type": "application/json",
         Authorization: `bearer ${cs.token}`,
@@ -103,7 +103,7 @@ const state = {
   async updatePassword(password: string) {
     const cs = this.getState();
     const res = await fetch(`${API_BASE_URL}/update-password`, {
-      method: "post",
+      method: "put",
       headers: {
         "content-type": "application/json",
         Authorization: `bearer ${cs.token}`,
@@ -146,7 +146,6 @@ const state = {
         "content-type": "application/json",
         authorization: `bearer ${cs.token}`,
       },
-      body: JSON.stringify({ status }),
     });
     const data = await res.json();
     return data;

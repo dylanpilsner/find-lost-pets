@@ -17,8 +17,6 @@ app.use(
 );
 app.use(cors());
 
-console.log(path.join(__dirname, "../fe-dist"));
-
 // sign up/in
 
 app.post("/user", async (req, res) => {
@@ -54,7 +52,7 @@ app.get("/profile", authMiddleware, async (req, res) => {
   res.json(user);
 });
 
-app.post("/update-name", authMiddleware, async (req, res) => {
+app.put("/update-name", authMiddleware, async (req, res) => {
   const { body } = req;
 
   try {
@@ -67,7 +65,7 @@ app.post("/update-name", authMiddleware, async (req, res) => {
     res.json({ err });
   }
 });
-app.post("/update-password", authMiddleware, async (req, res) => {
+app.put("/update-password", authMiddleware, async (req, res) => {
   const { body } = req;
 
   try {
@@ -112,9 +110,9 @@ app.get("/get-my-reported-pets", authMiddleware, async (req, res) => {
     res.json({ err });
   }
 });
-app.put("/pet/:id", authMiddleware, async (req, res) => {
+app.put("/pet/:petId", authMiddleware, async (req, res) => {
   const { name, lat, lng, pictureURL, point_of_reference } = req.body;
-  const { id } = req.params;
+  const { petId } = req.params;
 
   try {
     const updatedPet = await petController.editPet({
@@ -123,7 +121,7 @@ app.put("/pet/:id", authMiddleware, async (req, res) => {
       last_location_lng: lng,
       pictureURL,
       point_of_reference,
-      id,
+      id: petId,
     });
     res.json(updatedPet);
   } catch (err) {
@@ -131,22 +129,22 @@ app.put("/pet/:id", authMiddleware, async (req, res) => {
   }
 });
 
-app.put("/pet-status/:id", authMiddleware, async (req, res) => {
+app.put("/pet-status/:petId", authMiddleware, async (req, res) => {
   const { status } = req.body;
-  const { id } = req.params;
+  const { petId } = req.params;
 
   try {
-    const updatedStatus = await petController.changetPetStatus(status, id);
+    const updatedStatus = await petController.changetPetStatus(status, petId);
     res.json(updatedStatus);
   } catch (err) {
     res.json({ err });
   }
 });
 
-app.delete("/pet/:id", authMiddleware, async (req, res) => {
-  const { id } = req.params;
+app.delete("/pet/:petId", authMiddleware, async (req, res) => {
+  const { petId } = req.params;
   try {
-    const deletedPet = await petController.deletePost(id);
+    const deletedPet = await petController.deletePost(petId);
     res.json(deletedPet);
   } catch (err) {
     res.json({ err });
