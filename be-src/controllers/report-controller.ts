@@ -39,7 +39,7 @@ export async function reportPet(emailData: {
   <div class="img-container" style="width:100%; display:flex; justify-content:center;">
   <img src=${emailData.petImage} style="height:200px; border:1px solid black;" />
   </div>
-  <h3>${emailData.senderName} dejó la siguiente descripción de dónde la vió:</h3>
+  <h3>${emailData.senderName} dejó la siguiente descripción de dónde la vio:</h3>
   <p>${emailData.description}</p>
   <h4>Te podés contactar con ${emailData.senderName} al siguiente número: ${emailData.phone}</h4>
   <p>Te deseamos mucha suerte con tu búsqueda!</p>
