@@ -18,9 +18,6 @@
 ## Documentación
  * Documentación del backend hecha en Postman
 
- * [Documentación](https://documenter.getpostman.com/view/19369798/2s8YzMYR9F)
-
-
 ## Link a la app 👇
  * [App](https://find-lost-pets.onrender.com/)
 ## Tech Stack
